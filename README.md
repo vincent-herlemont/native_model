@@ -1,9 +1,7 @@
 # Native model
 
 [![Crates.io](https://img.shields.io/crates/v/native_model)](https://crates.io/crates/native_model)
-[![Build and Release](https://github.com/vincent-herlemont/native_model/actions/workflows/build_and_test_release.
-yml/badge.
-svg)](https://github.com/vincent-herlemont/native_model/actions/workflows/build_and_test_release.yml)
+[![Linux/Windows/macOS (Build/Test/Release)](https://github.com/vincent-herlemont/native_model/actions/workflows/build_and_test_release.yml/badge.svg)](https://github.com/vincent-herlemont/native_model/actions/workflows/build_and_test_release.yml)
 [![Documentation](https://docs.rs/native_model/badge.svg)](https://docs.rs/native_model)
 [![License](https://img.shields.io/crates/l/native_model)](LICENSE)
 
