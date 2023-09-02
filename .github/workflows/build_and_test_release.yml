@@ -1,4 +1,4 @@
-name: Linux/Windows/macOS (Build/Test/Release)
+name: Build Test Release
 
 on:
   push:
