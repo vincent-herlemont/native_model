@@ -1,0 +1,39 @@
+[package]
+name = "native_model"
+version = "0.1.0"
+authors = ["Vincent Herlemont <vincent@herlemont.fr>"]
+edition = "2021"
+description = "A thin wrapper around serialized data which add information of identity and version."
+license = "MIT"
+repository = "https://github.com/vincent-herlemont/native_model"
+readme = "README.md"
+build = "build.rs"
+keywords = ["serialization", "interoperability", "data-consistency", "flexibility", "performance"]
+categories = ["data-structures", "encoding", "rust-patterns"]
+
+[workspace]
+members = ["native_model_macro"]
+
+[dependencies]
+zerocopy = { version = "0.7.1", features = [ "derive"] }
+thiserror = "1.0"
+anyhow = "1.0"
+native_model_macro = { version = "0.1.0", path = "native_model_macro" }
+
+[dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+bincode = { version = "2.0.0-rc.3", features = ["serde"] }
+serde_json = "1.0"
+criterion = { version = "0.5.1" }
+skeptic = "0.13"
+
+[[bench]]
+name = "overhead"
+harness = false
+
+[[bench]]
+name = "overhead_on_bincode"
+harness = false
+
+[build-dependencies]
+skeptic = "0.13"
