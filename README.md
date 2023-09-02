@@ -80,14 +80,17 @@ First, you need to set up your serialization format. You can use any serializati
 Just define the following functions, so they must be imported in the scope where you use the native model.
 
 ```rust,ignore
-fn native_model_encode_body<T: Encode>(obj: &T) -> Result<Vec<u8>, dyn Error> {
+fn native_model_encode_body<T>(obj: &T) -> Result<Vec<u8>, E> {
    ...
 }
 
-fn native_model_decode_body<T: Decode>(data: Vec<u8>) -> Result<T, dyn Error> {
+fn native_model_decode_body<T>(data: Vec<u8>) -> Result<T, E> {
    ...
 }
 ```
+
+With `T` and `E` the type depending on the serialization format you use. Just `E` need to implement the `std::error::Error` trait.
+
 Examples: 
 - [bincode with encode/decode](./tests/example/encode_decode/bincode.rs)
 - [bincode with serde](./tests/example/encode_decode/bincode_serde.rs)
