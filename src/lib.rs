@@ -3,13 +3,13 @@
 //! - It aims to ensure:
 //!   - **Interoperability**: Different applications can work together even if they use different data model versions.
 //!   - **Data Consistency**: Ensures the data is processed as expected.
-//!   - **Flexibility**: Allows the use of any serialization format.
-//!   - **Minimal Performance Overhead**: Current performance shows linearly increasing encoding overhead with data size, and constant decoding overhead (~162 picoseconds) for all data sizes.
+//!   - **Flexibility**: Allows the use of any serialization format. Mode details [here](https://github.com/vincent-herlemont/native_model#setup-your-serialization-format).
+//!   - **Minimal Performance Overhead**: Current performance has a minimal overhead see [performance](https://github.com/vincent-herlemont/native_model#performance) section.
 //! - **Suitability**:
 //!   - Suitable for applications that are written in Rust, evolve independently, store data locally, and require incremental upgrades.
 //!   - Not suitable for non-Rust applications, systems not controlled by the user, or when human-readable formats are needed.
 //! - **Setup**:
-//!   - Users must define their own serialization format and data model. Examples and a `native_model` macro are provided for this purpose.
+//!   - Users must define their own serialization format and data model. Mode details [here](https://github.com/vincent-herlemont/native_model#setup-your-serialization-format).
 //! - **Development Stage**:
 //!   - The crate is in early development, and performance is expected to improve over time.
 //!
