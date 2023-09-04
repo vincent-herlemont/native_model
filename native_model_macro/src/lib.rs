@@ -94,7 +94,7 @@ pub fn native_model(args: TokenStream, input: TokenStream) -> TokenStream {
     let native_model_version_fn = generate_native_model_version(&attrs);
     let native_model_encode_body_fn = generate_native_model_encode_body();
     let native_model_encode_downgrade_body_fn = generate_native_model_encode_downgrade_body(&attrs);
-    let native_model_decode_body_fn = generate_native_model_decode_body();
+    let native_model_decode_body_fn = generate_native_model_decode_body(&attrs);
     let native_model_decode_upgrade_body_fn = generate_native_model_decode_upgrade_body(&attrs);
 
     let gen = quote! {

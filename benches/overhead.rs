@@ -14,7 +14,7 @@ fn native_model_decode_body<T: Decode>(data: Vec<u8>) -> Result<T, bincode::erro
 #[native_model(id = 1, version = 1)]
 struct Data(Vec<u8>);
 
-fn wrapper(data: &mut Vec<u8>) {
+fn wrap(data: &mut Vec<u8>) {
     native_model::wrapper::native_model_encode(data, 1, 1);
 }
 
@@ -31,16 +31,16 @@ fn criterion_benchmark(c: &mut Criterion) {
 
         // encode
         let data = Data(vec![1; nb_bytes]);
-        let encode_body = native_model_encode_body(&data).unwrap();
+        let mut encode_body = native_model_encode_body(&data).unwrap();
         group.bench_function(BenchmarkId::new("encode", nb_bytes), |b| {
-            b.iter(|| wrapper(&mut encode_body.clone()))
+            b.iter(|| wrap(&mut encode_body))
         });
 
         // decode
         let data = Data(vec![1; nb_bytes]);
-        let encode_body = native_model::encode(&data).unwrap();
+        let mut encode_body = native_model::encode(&data).unwrap();
         group.bench_function(BenchmarkId::new("decode", nb_bytes), |b| {
-            b.iter(|| unwrap(&mut encode_body.clone()))
+            b.iter(|| unwrap(&mut encode_body))
         });
     }
 }

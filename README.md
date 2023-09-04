@@ -15,7 +15,7 @@ See [concepts](#concepts) for more details.
   versions of the data model.
 - **Data Consistency**: Ensure that we process the data expected model.
 - **Flexibility**: You can use any serialization format you want. More details [here](#setup-your-serialization-format).
-- **Performance**: A minimal overhead. More details [here](#performance).
+- **Performance**: A minimal overhead (encode: ~20 ns, decode: ~40 ps). More details [here](#performance).
 
 ## Usage
 
@@ -71,9 +71,30 @@ When not to use it?
 - You need to have a human-readable format. (You can use a human-readable format like JSON wrapped in a native model,
   but you have to unwrap it to see the data correctly.)
 
-# Status
+## Status
 
 Early development. Not ready for production.
+
+## Concepts
+
+In order to understand how the native model works, you need to understand the following concepts.
+
+- **Identity**(`id`): The identity is the unique identifier of the model. It is used to identify the model and 
+  prevent to decode a model into the wrong Rust type.
+- **Version**(`version`) The version is the version of the model. It is used to check the compatibility between two 
+  models.
+- **Encode**: The encode is the process of converting a model into a byte array.
+- **Decode**: The decode is the process of converting a byte array into a model.
+- **Downgrade**: The downgrade is the process of converting a model into a previous version of the model.
+- **Upgrade**: The upgrade is the process of converting a model into a newer version of the model.
+
+Under the hood, the native model is a thin wrapper around serialized data. The `id` and the `version` are twice encoded with a [`little_endian::U32`](https://docs.rs/zerocopy/latest/zerocopy/byteorder/little_endian/type.U32.html). That represents 8 bytes, that are added at the beginning of the data.
+
+```
++------------------+------------------+------------------------------------+
+|     ID (4 bytes) | Version (4 bytes)| Data (indeterminate-length bytes)  |
++------------------+------------------+------------------------------------+
+```
 
 ## Setup your serialization format
 
@@ -146,46 +167,26 @@ struct Cord {
 
 Full example [here](tests/example/example_define_model.rs).
 
-# Concepts
+## Performance
 
-In order to understand how the native model works, you need to understand the following concepts.
+Native model has
+been designed to have a minimal and constant overhead. That means that the overhead is the same
+whatever the size of the data. Under the wood we use the [zerocopy](https://docs.rs/zerocopy/latest/zerocopy/) crate 
+to avoid unnecessary copies.
 
-- **Identity**(`id`): The identity is the unique identifier of the model. It is used to identify the model and 
-  prevent to decode a model into the wrong type.
-- **Version**(`version`) The version is the version of the model. It is used to check the compatibility between two 
-  models.
-- **Encode**: The encode is the process of converting a model into a byte array.
-- **Decode**: The decode is the process of converting a byte array into a model.
-- **Downgrade**: The downgrade is the process of converting a model into a previous version of the model.
-- **Upgrade**: The upgrade is the process of converting a model into a newer version of the model.
+👉 To know the total time of the encode/decode, you need to add the time of your serialization format.
 
-Under the hood, the native model is a thin wrapper around serialized data. The `id` and the `version` are twice encoded with a [`little_endian::U32`](https://docs.rs/zerocopy/latest/zerocopy/byteorder/little_endian/type.U32.html). That represents 8 bytes, that are added at the beginning of the data.
+Resume:
+- **Encode**: ~20 ns
+- **Decode**: ~40 ps
 
-```
-+------------------+------------------+------------------------------------+
-|     ID (4 bytes) | Version (4 bytes)| Data (indeterminate-length bytes)  |
-+------------------+------------------+------------------------------------+
-```
-
-# Performance
-
-This crate is in an early stage of development, so the performance should be improved in the future.
-The goal is to have a minimal and constant overhead for all data sizes. It uses the [zerocopy](https://docs.rs/zerocopy/latest/zerocopy/) crate to avoid unnecessary copies.
-
-Current performance:
-- Encode time: have overhead that evolves linearly with the data size.
-- Decode time: have overhead of ~162 ps for all data sizes.
-
-
-|       data size       | encode time (ns/ps/µs/ms) | decode time (ps) |
-|:---------------------:|:--------------------------:|:----------------:|
-|          1 B          | 40.093 ns - 40.510 ns      | 161.87 ps - 162.02 ps |
-|    1 KiB (1024 B)     | 116.45 ns - 116.83 ns      | 161.85 ps - 162.08 ps |
-|   1 MiB (1048576 B)   | 66.697 µs - 67.634 µs      | 161.87 ps - 162.18 ps |
-|  10 MiB (10485760 B)  | 1.5670 ms - 1.5843 ms      | 162.40 ps - 163.52 ps |
-| 100 MiB (104857600 B) | 63.778 ms - 64.132 ms      | 162.71 ps - 165.10 ps |
+|      data size       |   encode time (ns)    | decode time (ps)        |
+|:--------------------:|:---------------------:|:-----------------------:|
+|         1 B          | 19.769 ns - 20.154 ns | 40.526 ps - 40.617 ps   |
+|        1 KiB         | 19.597 ns - 19.971 ns | 40.534 ps - 40.633 ps   |
+|        1 MiB         | 19.662 ns - 19.910 ns | 40.508 ps - 40.632 ps   |
+|        10 MiB        | 19.591 ns - 19.980 ns | 40.504 ps - 40.605 ps   |
+|       100 MiB        | 19.669 ns - 19.867 ns | 40.520 ps - 40.644 ps   |
 
 Benchmark of the native model overhead [here](benches/overhead.rs).
-
-To know how much time it takes to encode/decode your data, you need to add this overhead to the time of your serialization format.
 

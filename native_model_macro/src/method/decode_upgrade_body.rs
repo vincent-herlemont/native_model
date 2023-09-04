@@ -8,11 +8,11 @@ pub(crate) fn generate_native_model_decode_upgrade_body(attrs: &ModelAttributes)
 
     let model_from_or_try_from = if let Some(from) = native_model_from {
         quote! {
-            #from::native_model_decode_upgrade_body(data, x).map(|a| a.into())
+            #from::native_model_decode_upgrade_body(data, id, version).map(|a| a.into())
         }
     } else if let Some((try_from, error_try_from)) = native_model_try_from {
         quote! {
-            let result = #try_from::native_model_decode_upgrade_body(data, x).map(|b| {
+            let result = #try_from::native_model_decode_upgrade_body(data, id, version).map(|b| {
                 b.try_into()
                     .map_err(|e: #error_try_from| native_model::UpgradeError {
                         msg: format!("{}", e),
@@ -24,22 +24,22 @@ pub(crate) fn generate_native_model_decode_upgrade_body(attrs: &ModelAttributes)
     } else {
         quote! {
             Err(native_model::Error::UpgradeNotSupported {
-                from: x,
+                from: version,
                 to: Self::native_model_version(),
             })
         }
     };
 
     let gen = quote! {
-        fn native_model_decode_upgrade_body(data: Vec<u8>, x: u32) -> native_model::Result<Self> {
-            if x == Self::native_model_version() {
-                let result = Self::native_model_decode_body(data)?;
+        fn native_model_decode_upgrade_body(data: Vec<u8>, id: u32, version: u32) -> native_model::Result<Self> {
+            if version == Self::native_model_version() {
+                let result = Self::native_model_decode_body(data, id)?;
                 Ok(result)
-            } else if x < Self::native_model_version() {
+            } else if version < Self::native_model_version() {
                 #model_from_or_try_from
             } else {
                 Err(native_model::Error::UpgradeNotSupported {
-                    from: x,
+                    from: version,
                     to: Self::native_model_version(),
                 })
             }

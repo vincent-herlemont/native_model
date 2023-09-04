@@ -6,11 +6,11 @@ pub trait Model: Sized {
 
     // --------------- Decode ---------------
 
-    fn native_model_decode_body(data: Vec<u8>) -> DecodeResult<Self>
+    fn native_model_decode_body(data: Vec<u8>, id: u32) -> DecodeResult<Self>
     where
         Self: Sized;
 
-    fn native_model_decode_upgrade_body(data: Vec<u8>, version: u32) -> Result<Self>
+    fn native_model_decode_upgrade_body(data: Vec<u8>, id: u32, version: u32) -> Result<Self>
     where
         Self: Sized;
 
@@ -19,9 +19,13 @@ pub trait Model: Sized {
         Self: Sized,
     {
         let native_model = crate::Wrapper::deserialize(&data[..]).unwrap();
+        let source_id = native_model.get_id();
         let source_version = native_model.get_version();
-        let result =
-            Self::native_model_decode_upgrade_body(native_model.value().to_vec(), source_version)?;
+        let result = Self::native_model_decode_upgrade_body(
+            native_model.value().to_vec(),
+            source_id,
+            source_version,
+        )?;
         Ok((result, source_version))
     }
 
@@ -40,7 +44,7 @@ pub trait Model: Sized {
         Self: Sized,
     {
         let mut data = self.native_model_encode_body()?;
-        crate::native_model_encode(
+        let data = crate::native_model_encode(
             &mut data,
             Self::native_model_id(),
             Self::native_model_version(),
@@ -54,7 +58,7 @@ pub trait Model: Sized {
     {
         let version = version.clone();
         let mut data = self.native_model_encode_downgrade_body(version)?;
-        crate::native_model_encode(&mut data, Self::native_model_id(), version);
+        let data = crate::native_model_encode(&mut data, Self::native_model_id(), version);
         Ok(data)
     }
 }

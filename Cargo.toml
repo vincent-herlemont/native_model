@@ -35,5 +35,9 @@ harness = false
 name = "overhead_on_bincode"
 harness = false
 
+[[bench]]
+name = "prepend_bytes"
+harness = false
+
 [build-dependencies]
 skeptic = "0.13"

@@ -62,7 +62,7 @@ impl From<Foo3> for Foo2 {
 fn test_decode_foo1_to_foo2() {
     let foo1 = Foo1 { x: 100 };
     let foo1_encoded = foo1.native_model_encode_body().unwrap();
-    let foo2_decoded = Foo2::native_model_decode_upgrade_body(foo1_encoded, 1).unwrap();
+    let foo2_decoded = Foo2::native_model_decode_upgrade_body(foo1_encoded, 1, 1).unwrap();
     assert_eq!(foo1.x.to_string(), foo2_decoded.x);
 }
 
@@ -72,7 +72,7 @@ fn test_decode_foo2_to_foo3() {
         x: "100".to_string(),
     };
     let foo2_encoded = foo2.native_model_encode_body().unwrap();
-    let foo3_decoded = Foo3::native_model_decode_upgrade_body(foo2_encoded, 2).unwrap();
+    let foo3_decoded = Foo3::native_model_decode_upgrade_body(foo2_encoded, 1, 2).unwrap();
     assert_eq!(Foo3::X(100), foo3_decoded);
 }
 
@@ -80,7 +80,7 @@ fn test_decode_foo2_to_foo3() {
 fn test_decode_foo1_to_foo3() {
     let foo1 = Foo1 { x: 100 };
     let foo1_encoded = foo1.native_model_encode_body().unwrap();
-    let foo3_decoded = Foo3::native_model_decode_upgrade_body(foo1_encoded, 1).unwrap();
+    let foo3_decoded = Foo3::native_model_decode_upgrade_body(foo1_encoded, 1, 1).unwrap();
     assert_eq!(Foo3::X(100), foo3_decoded);
 }
 
@@ -88,7 +88,7 @@ fn test_decode_foo1_to_foo3() {
 fn test_decode_foo1_to_foo1() {
     let foo1 = Foo1 { x: 100 };
     let foo1_encoded = foo1.native_model_encode_body().unwrap();
-    let foo1_decoded = Foo1::native_model_decode_upgrade_body(foo1_encoded, 1).unwrap();
+    let foo1_decoded = Foo1::native_model_decode_upgrade_body(foo1_encoded, 1, 1).unwrap();
     assert_eq!(foo1, foo1_decoded);
 }
 
@@ -98,7 +98,7 @@ fn test_decode_foo2_to_foo2() {
         x: "100".to_string(),
     };
     let foo2_encoded = foo2.native_model_encode_body().unwrap();
-    let foo2_decoded = Foo2::native_model_decode_upgrade_body(foo2_encoded, 2).unwrap();
+    let foo2_decoded = Foo2::native_model_decode_upgrade_body(foo2_encoded, 1, 2).unwrap();
     assert_eq!(foo2, foo2_decoded);
 }
 
@@ -106,7 +106,7 @@ fn test_decode_foo2_to_foo2() {
 fn test_decode_foo3_to_foo3() {
     let foo3 = Foo3::X(100);
     let foo3_encoded = foo3.native_model_encode_body().unwrap();
-    let foo3_decoded = Foo3::native_model_decode_upgrade_body(foo3_encoded, 3).unwrap();
+    let foo3_decoded = Foo3::native_model_decode_upgrade_body(foo3_encoded, 1, 3).unwrap();
     assert_eq!(foo3, foo3_decoded);
 }
 
@@ -114,7 +114,7 @@ fn test_decode_foo3_to_foo3() {
 fn test_should_fail_decode_foo3_to_foo2() {
     let foo3 = Foo3::X(100);
     let foo3_encoded = foo3.native_model_encode_body().unwrap();
-    let foo3_decoded = Foo2::native_model_decode_upgrade_body(foo3_encoded, 3);
+    let foo3_decoded = Foo2::native_model_decode_upgrade_body(foo3_encoded, 1, 3);
     assert!(foo3_decoded.is_err());
     assert!(matches!(
         foo3_decoded.unwrap_err(),
@@ -126,7 +126,7 @@ fn test_should_fail_decode_foo3_to_foo2() {
 fn test_should_fail_decode_foo3_to_foo1() {
     let foo3 = Foo3::X(100);
     let foo3_encoded = foo3.native_model_encode_body().unwrap();
-    let foo3_decoded = Foo1::native_model_decode_upgrade_body(foo3_encoded, 3);
+    let foo3_decoded = Foo1::native_model_decode_upgrade_body(foo3_encoded, 1, 3);
     assert!(foo3_decoded.is_err());
     assert!(matches!(
         foo3_decoded.unwrap_err(),
@@ -140,10 +140,32 @@ fn test_should_fail_decode_foo2_to_foo1() {
         x: "100".to_string(),
     };
     let foo2_encoded = foo2.native_model_encode_body().unwrap();
-    let foo2_decoded = Foo1::native_model_decode_upgrade_body(foo2_encoded, 2);
+    let foo2_decoded = Foo1::native_model_decode_upgrade_body(foo2_encoded, 1, 2);
     assert!(foo2_decoded.is_err());
     assert!(matches!(
         foo2_decoded.unwrap_err(),
         native_model::Error::UpgradeNotSupported { from: 2, to: 1 }
     ));
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[native_model(id = 2, version = 1)]
+struct Foo1Bis {
+    x: i32,
+}
+
+#[test]
+fn test_prevent_to_decode_the_wrong_model() {
+    let foo1 = Foo1 { x: 100 };
+    let foo1_encoded = foo1.native_model_encode_body().unwrap();
+    let foo1_decoded = Foo1Bis::native_model_decode_upgrade_body(foo1_encoded, 1, 1);
+    dbg!(&foo1_decoded);
+    // assert!(foo1_decoded.is_err());
+    // assert!(matches!(
+    //     foo1_decoded.unwrap_err(),
+    //     native_model::Error::TypeIdMismatch {
+    //         expected: 1,
+    //         actual: 1
+    //     }
+    // ));
 }

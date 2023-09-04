@@ -1,7 +1,6 @@
 use bincode::{config, Decode, Encode};
 use native_model::Result;
 use native_model::{DecodeBodyError, DecodeResult, EncodeBodyError, EncodeResult, Model};
-
 // Add this function to the macro for custom serialization
 fn native_model_encode<T: Encode>(obj: &T) -> anyhow::Result<Vec<u8>> {
     let result = bincode::encode_to_vec(obj, config::standard())?;
@@ -29,16 +28,16 @@ impl Model for A {
         1
     }
 
-    fn native_model_decode_upgrade_body(_data: Vec<u8>, x: u32) -> Result<Self> {
+    fn native_model_decode_upgrade_body(_data: Vec<u8>, _id: u32, version: u32) -> Result<Self> {
         println!(
             "A::deserialization_and_upgrade({}, {})",
-            x,
+            version,
             Self::native_model_version()
         );
-        if x == Self::native_model_version() {
+        if version == Self::native_model_version() {
             Ok(Self {})
-        } else if x < Self::native_model_version() {
-            panic!("The version {} not supported", x);
+        } else if version < Self::native_model_version() {
+            panic!("The version {} not supported", version);
         } else {
             panic!("Not implemented");
         }
@@ -54,11 +53,11 @@ impl Model for A {
         })
     }
 
-    fn native_model_decode_body(data: Vec<u8>) -> DecodeResult<Self>
+    fn native_model_decode_body(data: Vec<u8>, _id: u32) -> DecodeResult<Self>
     where
         Self: Sized,
     {
-        native_model_decode(data).map_err(|e| DecodeBodyError {
+        native_model_decode(data).map_err(|e| DecodeBodyError::DecodeError {
             msg: format!("{}", e),
             source: e.into(),
         })
@@ -95,16 +94,16 @@ impl Model for B {
         2
     }
 
-    fn native_model_decode_upgrade_body(_data: Vec<u8>, x: u32) -> Result<Self> {
+    fn native_model_decode_upgrade_body(_data: Vec<u8>, id: u32, version: u32) -> Result<Self> {
         println!(
             "B::deserialization_and_upgrade({}, {})",
-            x,
+            version,
             Self::native_model_version()
         );
-        if x == Self::native_model_version() {
+        if version == Self::native_model_version() {
             Ok(Self {})
-        } else if x < Self::native_model_version() {
-            A::native_model_decode_upgrade_body(_data, x).map(|a| a.into())
+        } else if version < Self::native_model_version() {
+            A::native_model_decode_upgrade_body(_data, id, version).map(|a| a.into())
         } else {
             panic!("Not implemented");
         }
@@ -120,11 +119,11 @@ impl Model for B {
         })
     }
 
-    fn native_model_decode_body(data: Vec<u8>) -> DecodeResult<Self>
+    fn native_model_decode_body(data: Vec<u8>, _id: u32) -> DecodeResult<Self>
     where
         Self: Sized,
     {
-        native_model_decode(data).map_err(|e| DecodeBodyError {
+        native_model_decode(data).map_err(|e| DecodeBodyError::DecodeError {
             msg: format!("{}", e),
             source: e.into(),
         })
@@ -173,16 +172,16 @@ impl Model for C {
         3
     }
 
-    fn native_model_decode_upgrade_body(_data: Vec<u8>, x: u32) -> Result<Self> {
+    fn native_model_decode_upgrade_body(_data: Vec<u8>, id: u32, version: u32) -> Result<Self> {
         println!(
             "C::deserialization_and_upgrade({}, {})",
-            x,
+            version,
             Self::native_model_version()
         );
-        if x == Self::native_model_version() {
+        if version == Self::native_model_version() {
             Ok(Self {})
-        } else if x < Self::native_model_version() {
-            let result = B::native_model_decode_upgrade_body(_data, x).map(|b| {
+        } else if version < Self::native_model_version() {
+            let result = B::native_model_decode_upgrade_body(_data, id, version).map(|b| {
                 b.try_into()
                     .map_err(|e: anyhow::Error| native_model::UpgradeError {
                         msg: format!("{}", e),
@@ -205,11 +204,11 @@ impl Model for C {
         })
     }
 
-    fn native_model_decode_body(data: Vec<u8>) -> DecodeResult<Self>
+    fn native_model_decode_body(data: Vec<u8>, _id: u32) -> DecodeResult<Self>
     where
         Self: Sized,
     {
-        native_model_decode(data).map_err(|e| DecodeBodyError {
+        native_model_decode(data).map_err(|e| DecodeBodyError::DecodeError {
             msg: format!("{}", e),
             source: e.into(),
         })
@@ -289,16 +288,17 @@ fn test_encode_downgrade() {
 
 #[test]
 fn test_decode_upgrade() {
-    let x = 3;
-    let result = C::native_model_decode_upgrade_body(vec![], x);
+    let id = 1;
+    let version = 3;
+    let result = C::native_model_decode_upgrade_body(vec![], id, version);
     dbg!(&result);
 
-    let x = 2;
-    let result = C::native_model_decode_upgrade_body(vec![], x);
+    let version = 2;
+    let result = C::native_model_decode_upgrade_body(vec![], id, version);
     dbg!(&result);
 
-    let x = 1;
-    let result = C::native_model_decode_upgrade_body(vec![], x);
+    let version = 1;
+    let result = C::native_model_decode_upgrade_body(vec![], id, version);
     dbg!(&result);
 }
 
@@ -311,7 +311,7 @@ where
     T: Model,
 {
     if model_id == T::native_model_id() {
-        T::native_model_decode_upgrade_body(_data, version)
+        T::native_model_decode_upgrade_body(_data, model_id, version)
     } else {
         panic!("The model id {} not supported", model_id);
     }

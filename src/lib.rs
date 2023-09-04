@@ -56,10 +56,15 @@ pub type DecodeResult<T> = std::result::Result<T, DecodeBodyError>;
 
 #[derive(Error, Debug)]
 #[error("Decode body error: {msg}")]
-pub struct DecodeBodyError {
-    pub msg: String,
-    #[source]
-    pub source: anyhow::Error,
+pub enum DecodeBodyError {
+    #[error("Mismatched model id")]
+    MismatchedModelId,
+    #[error("Decode error: {msg}")]
+    DecodeError {
+        msg: String,
+        #[source]
+        source: anyhow::Error,
+    },
 }
 
 pub type EncodeResult<T> = std::result::Result<T, EncodeBodyError>;
