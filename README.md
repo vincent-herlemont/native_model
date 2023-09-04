@@ -7,6 +7,8 @@
 
 A thin wrapper around serialized data which add information of identity and version.
 
+See [concepts](#concepts) for more details.
+
 ## Goals
 
 - **Interoperability**: Allows different applications to work together, even if they are using different 
@@ -35,7 +37,7 @@ let bytes = native_model::encode(&dot).unwrap();
 // Application 1 sends bytes to Application 2.
 
 // Application 2
-// We are able to decode the bytes directly into a new type DotV2.
+// We are able to decode the bytes directly into a new type DotV2 (upgrade).
 let (mut dot, source_version) = native_model::decode::<DotV2>(bytes).unwrap();
 assert_eq!(dot, DotV2 { 
     name: "".to_string(), 
@@ -44,7 +46,7 @@ assert_eq!(dot, DotV2 {
 });
 dot.name = "Dot".to_string();
 dot.x = 5;
-// For interoperability, we encode the data with the version compatible with Application 1.
+// For interoperability, we encode the data with the version compatible with Application 1 (downgrade).
 let bytes = native_model::encode_downgrade(dot, source_version).unwrap();
 
 // Application 2 sends bytes to Application 1.
@@ -56,14 +58,14 @@ assert_eq!(dot, DotV1(5, 2));
 
 Full example [here](./tests/example/example_main.rs).
 
-When use it?
+When to use it?
 - Your applications that interact with each other are written in Rust.
 - Your applications evolve independently need to read serialized data coming from each other.
 - Your applications store data locally and need to read it later by a newer version of the application.
 - Your systems need to be upgraded incrementally. Instead of having to upgrade the entire system at once, individual
   applications can be upgraded one at a time, while still being able to communicate with each other.
 
-When not use it?
+When not to use it?
 - Your applications that interact with each other are **not all** written in Rust.
 - Your applications need to communicate with other systems that you don't control.
 - You need to have a human-readable format. (You can use a human-readable format like JSON wrapped in a native model,
@@ -144,6 +146,26 @@ struct Cord {
 
 Full example [here](tests/example/example_define_model.rs).
 
+# Concepts
+
+In order to understand how the native model works, you need to understand the following concepts.
+
+- **Identity**(`id`): The identity is the unique identifier of the model. It is used to identify the model and 
+  prevent to decode a model into the wrong type.
+- **Version**(`version`) The version is the version of the model. It is used to check the compatibility between two 
+  models.
+- **Encode**: The encode is the process of converting a model into a byte array.
+- **Decode**: The decode is the process of converting a byte array into a model.
+- **Downgrade**: The downgrade is the process of converting a model into a previous version of the model.
+- **Upgrade**: The upgrade is the process of converting a model into a newer version of the model.
+
+Under the hood, the native model is a thin wrapper around serialized data. The `id` and the `version` are twice encoded with a [`little_endian::U32`](https://docs.rs/zerocopy/latest/zerocopy/byteorder/little_endian/type.U32.html). That represents 8 bytes, that are added at the beginning of the data.
+
+```
++------------------+------------------+------------------------------------+
+|     ID (4 bytes) | Version (4 bytes)| Data (indeterminate-length bytes)  |
++------------------+------------------+------------------------------------+
+```
 
 # Performance
 
