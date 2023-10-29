@@ -29,6 +29,8 @@ jobs:
         run: just --version
       - name: Build
         run: just build_all
+      - name: Test
+        run: just test_all
   release:
     name: Release
     runs-on: ubuntu-latest
