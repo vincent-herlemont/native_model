@@ -16,6 +16,7 @@
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
 
 mod codec;
+pub use codec::*;
 mod header;
 mod model;
 pub mod wrapper;
