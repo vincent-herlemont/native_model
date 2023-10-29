@@ -1,3 +1,5 @@
+pub mod bincode_1_3;
+
 /// Encode trait for your own encoding method.
 ///
 /// Example:
