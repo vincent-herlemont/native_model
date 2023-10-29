@@ -1,3 +1,4 @@
+#![cfg(feature = "bincode_1_3")]
 use native_model::native_model;
 use serde::Deserialize;
 use serde::Serialize;

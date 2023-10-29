@@ -1,3 +1,4 @@
+#![cfg(feature = "postcard_1_0")]
 use native_model::{native_model};
 use serde::Deserialize;
 use serde::Serialize;

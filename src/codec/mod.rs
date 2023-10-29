@@ -1,5 +1,8 @@
+#[cfg(all(feature = "serde", feature = "bincode_1_3"))]
 pub mod bincode_1_3;
+#[cfg(all(feature = "serde", feature = "bincode_2_rc"))]
 pub mod bincode_2_rc;
+#[cfg(all(feature = "serde", feature = "postcard_1_0"))]
 pub mod postcard_1_0;
 
 /// Encode trait for your own encoding method.

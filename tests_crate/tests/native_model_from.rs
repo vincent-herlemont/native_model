@@ -1,27 +1,16 @@
-use bincode::{config, Decode, Encode};
-use native_model::native_model;
-pub struct Bincode;
-impl<T: bincode::Encode> native_model::Encode<T> for Bincode {
-    type Error = bincode::error::EncodeError;
-    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
-        bincode::encode_to_vec(obj, config::standard())
-    }
-}
+#![cfg(feature = "bincode_1_3")]
 
-impl<T: bincode::Decode> native_model::Decode<T> for Bincode {
-    type Error = bincode::error::DecodeError;
-    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
-        bincode::decode_from_slice(&data, config::standard()).map(|(result, _)| result)
-    }
-}
-#[derive(Debug, Encode, Decode, PartialEq)]
-#[native_model(id = 1, version = 1, with = Bincode)]
+use native_model::native_model;
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[native_model(id = 1, version = 1)]
 struct Foo1 {
     x: i32,
 }
 
-#[derive(Debug, Encode, Decode, PartialEq)]
-#[native_model(id = 1, version = 2, with = Bincode, from = Foo1)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+#[native_model(id = 1, version = 2, from = Foo1)]
 struct Foo2 {
     x: i32,
     c: char,
@@ -65,11 +54,11 @@ fn test_decode_foo1_to_foo2() {
 fn test_encode_foo2_to_foo1() {
     let foo2 = Foo2 { x: 100, c: 'a' };
     let foo2_packed = native_model::encode(&foo2).unwrap();
-    assert_eq!(foo2_packed, vec![1, 0, 0, 0, 2, 0, 0, 0, 200, 97]);
+    assert_eq!(foo2_packed, vec![1, 0, 0, 0, 2, 0, 0, 0, 100, 0, 0, 0, 97]);
     let (foo2_decoded, _) = native_model::decode::<Foo2>(foo2_packed.clone()).unwrap();
     assert_eq!(Foo2 { x: 100, c: 'a' }, foo2_decoded);
     let foo1_packed = native_model::encode_downgrade(foo2, 1).unwrap();
-    assert_eq!(foo1_packed, vec![1, 0, 0, 0, 1, 0, 0, 0, 200]);
+    assert_eq!(foo1_packed, vec![1, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0]);
     let (foo1_decoded, _) = native_model::decode::<Foo1>(foo1_packed.clone()).unwrap();
     assert_eq!(Foo1 { x: 100 }, foo1_decoded);
 }
@@ -78,11 +67,11 @@ fn test_encode_foo2_to_foo1() {
 fn test_encode_foo1_to_foo1() {
     let foo1 = Foo1 { x: 100 };
     let foo1_packed = native_model::encode(&foo1).unwrap();
-    assert_eq!(foo1_packed, vec![1, 0, 0, 0, 1, 0, 0, 0, 200]);
+    assert_eq!(foo1_packed, vec![1, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0]);
     let (foo1_decoded, _) = native_model::decode::<Foo1>(foo1_packed.clone()).unwrap();
     assert_eq!(Foo1 { x: 100 }, foo1_decoded);
     let foo1_packed = native_model::encode_downgrade(foo1, 1).unwrap();
-    assert_eq!(foo1_packed, vec![1, 0, 0, 0, 1, 0, 0, 0, 200]);
+    assert_eq!(foo1_packed, vec![1, 0, 0, 0, 1, 0, 0, 0, 100, 0, 0, 0]);
     let (foo1_decoded, _) = native_model::decode::<Foo1>(foo1_packed.clone()).unwrap();
     assert_eq!(Foo1 { x: 100 }, foo1_decoded);
 }
