@@ -15,12 +15,12 @@
 //!
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
 
-mod encode_decode;
+mod codec;
 mod header;
 mod model;
 pub mod wrapper;
 
-pub use encode_decode::*;
+pub use codec::*;
 pub use model::*;
 
 /// Macro to generate a [`native_model`] implementation for a struct.
