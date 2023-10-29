@@ -1,22 +1,6 @@
 use bincode;
 use serde::{Deserialize, Serialize};
 
-// fn native_model_encode_body<T: Serialize>(
-//     model: &T,
-// ) -> Result<Vec<u8>, bincode::error::EncodeError> {
-//     {
-//         bincode::serde::encode_to_vec(model, bincode::config::standard())
-//     }
-// }
-//
-// fn native_model_decode_body<T: for<'a> Deserialize<'a>>(
-//     data: Vec<u8>,
-// ) -> Result<T, bincode::error::DecodeError> {
-//     {
-//         Ok(bincode::serde::decode_from_slice(&data, bincode::config::standard())?.0)
-//     }
-// }
-
 pub struct Bincode;
 
 impl<T: Serialize> native_model::Encode<T> for Bincode {
