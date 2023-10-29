@@ -1,16 +1,8 @@
-use bincode::{Decode, Encode};
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 use native_model_macro::native_model;
-
-fn native_model_encode_body<T: Encode>(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
-    bincode::encode_to_vec(obj, bincode::config::standard())
-}
-
-fn native_model_decode_body<T: Decode>(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
-    bincode::decode_from_slice(&data, bincode::config::standard()).map(|(result, _)| result)
-}
-
-#[derive(Encode, Decode)]
+use serde::{Deserialize, Serialize};
+use native_model::Model;
+#[derive(Serialize, Deserialize)]
 #[native_model(id = 1, version = 1)]
 struct Data(Vec<u8>);
 
@@ -31,7 +23,7 @@ fn criterion_benchmark(c: &mut Criterion) {
 
         // encode
         let data = Data(vec![1; nb_bytes]);
-        let mut encode_body = native_model_encode_body(&data).unwrap();
+        let mut encode_body = data.native_model_encode_body().unwrap();
         group.bench_function(BenchmarkId::new("encode", nb_bytes), |b| {
             b.iter(|| wrap(&mut encode_body))
         });
