@@ -1,30 +1,13 @@
 ```rust,skt-main
-use bincode;
-use bincode::{{Decode, Encode, config}};
 use native_model_macro::native_model;
+use serde::{{Deserialize, Serialize}};
 
-pub struct Bincode;
-
-impl<T: bincode::Encode> native_model::Encode<T> for Bincode {{
-    type Error = bincode::error::EncodeError;
-    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {{
-        bincode::encode_to_vec(obj, config::standard())
-    }}
-}}
-
-impl<T: bincode::Decode> native_model::Decode<T> for Bincode {{
-    type Error = bincode::error::DecodeError;
-    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {{
-        bincode::decode_from_slice(&data, config::standard()).map(|(result, _)| result)
-    }}
-}}
-
-#[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 1, with = Bincode)]
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 1)]
 struct DotV1(u32, u32);
 
-#[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 2, with = Bincode, from = DotV1)]
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 2, from = DotV1)]
 struct DotV2 {{
     name: String,
     x: u64,
@@ -54,23 +37,7 @@ fn main() {{
 ```
 
 ```rust,skt-define-models
-use bincode::{{config, Decode, Encode}};
-
-pub struct Bincode;
-
-impl<T: bincode::Encode> native_model::Encode<T> for Bincode {{
-    type Error = bincode::error::EncodeError;
-    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {{
-        bincode::encode_to_vec(obj, config::standard())
-    }}
-}}
-
-impl<T: bincode::Decode> native_model::Decode<T> for Bincode {{
-    type Error = bincode::error::DecodeError;
-    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {{
-        bincode::decode_from_slice(&data, config::standard()).map(|(result, _)| result)
-    }}
-}}
+use serde::{{Deserialize, Serialize}};
 
 {}
 

@@ -5,7 +5,7 @@
 [![Documentation](https://docs.rs/native_model/badge.svg)](https://docs.rs/native_model)
 [![License](https://img.shields.io/crates/l/native_model)](LICENSE)
 
-A thin wrapper around serialized data which add information of identity and version.
+Add interoperability                  on the top  of   serialization formats like bincode, postcard etc.
 
 See [concepts](#concepts) for more details.
 
@@ -20,12 +20,12 @@ See [concepts](#concepts) for more details.
 ## Usage
 
 ```
-            Application 1 (DotV1)                     Application 2 (DotV1 and DotV2)
-                       |                                          |
-          Encode DotV1 |----------------------------------------> | Decode DotV1 to DotV2
-                       |                                          | Modify DotV2
-          Decode DotV1 | <----------------------------------------| Encode DotV2 back to DotV1
-                       |                                          |
+       Application 1 (DotV1)        Application 2 (DotV1 and DotV2)
+                |                                  |
+   Encode DotV1 |--------------------------------> | Decode DotV1 to DotV2
+                |                                  | Modify DotV2
+   Decode DotV1 | <--------------------------------| Encode DotV2 back to DotV1
+                |                                  |
 ```
 
 
@@ -56,20 +56,83 @@ let (dot, _) = native_model::decode::<DotV1>(bytes).unwrap();
 assert_eq!(dot, DotV1(5, 2));
  ```
 
-Full example [here](./tests/example/example_main.rs).
+ - Full example [here](./tests_crate/tests/example/example_main.rs).
 
-When to use it?
-- Your applications that interact with each other are written in Rust.
-- Your applications evolve independently need to read serialized data coming from each other.
-- Your applications store data locally and need to read it later by a newer version of the application.
-- Your systems need to be upgraded incrementally. Instead of having to upgrade the entire system at once, individual
-  applications can be upgraded one at a time, while still being able to communicate with each other.
+## Serialization format
 
-When not to use it?
-- Your applications that interact with each other are **not all** written in Rust.
-- Your applications need to communicate with other systems that you don't control.
-- You need to have a human-readable format. (You can use a human-readable format like JSON wrapped in a native model,
-  but you have to unwrap it to see the data correctly.)
+You can use  default serialization formats via  the feature flags, like:
+
+```toml
+[dependencies]
+native_model = { version = "0.1", features = ["bincode_2_rc"] }
+```
+
+Each feature flag corresponds to a specific minor version of the serialization format. In order to avoid breaking
+changes, the default serialization format is the oldest one.
+
+- `bincode_1_3`: [bincode](https://docs.rs/bincode/1.3.3/bincode/) v1.3 (default)
+- `bincode_2_rc`: [bincode](https://docs.rs/bincode/2.0.0-rc.3/bincode/) v2.0.0-rc3
+- `postcard_1_0`: [postcard](https://docs.rs/postcard/1.0.0/postcard/) v1.0
+
+### Custom serialization format
+
+Define a struct with the name you want. This struct must implement [`native_model::Encode`](https://docs.rs/native_model/latest/native_model/trait.Encode.html) and [`native_model::Decode`](https://docs.rs/native_model/latest/native_model/trait.Decode.html) traits.
+
+Full examples: 
+- [bincode with encode/decode](./tests_crate/tests/example/encode_decode/bincode.rs)
+- [bincode with serde](./tests_crate/tests/example/encode_decode/bincode_serde.rs)
+
+Others examples,  see the default implementations:
+- [bincode v1.3](./src/codec/bincode_1_3.rs)
+-  [bincode v2.0 (rc)](./src/codec/bincode_2_rc.rs)
+-  [postcard v1.0](./src/codec/postcard_1_0.rs)
+
+## Data model
+
+Define your model using the macro [`native_model`](file:///home/vincentherlemont/IdeaProjects/native_model/target/doc/native_model/attr.native_model.html).
+
+Attributes:
+- `id = u32`: The unique identifier of the model.
+- `version = u32`: The version of the model.
+- `with = type`: The serialization format that you use for the Encode/Decode implementation. Setup [here](#setup-your-serialization-format).
+- `from = type`: Optional, the previous version of the model.
+    - `type`: The previous version of the model that you use for the From implementation.
+- `try_from = (type, error)`: Optional, the previous version of the model with error handling.
+    - `type`: The previous version of the model that you use for the TryFrom implementation.
+    - `error`: The error type that you use for the TryFrom implementation.
+
+```rust,skt-define-models
+use native_model::native_model;
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 1)]
+struct DotV1(u32, u32);
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 2, from = DotV1)]
+struct DotV2 {
+    name: String,
+    x: u64,
+    y: u64,
+}
+
+// Implement the conversion between versions From<DotV1> for DotV2 and From<DotV2> for DotV1.
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 3, try_from = (DotV2, anyhow::Error))]
+struct DotV3 {
+    name: String,
+    cord: Cord,
+}
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+struct Cord {
+    x: u64,
+    y: u64,
+}
+
+// Implement the conversion between versions From<DotV2> for DotV3 and From<DotV3> for DotV2.
+```
 
 ## Status
 
@@ -94,83 +157,6 @@ Under the hood, the native model is a thin wrapper around serialized data. The `
 +------------------+------------------+------------------------------------+
 |     ID (4 bytes) | Version (4 bytes)| Data (indeterminate-length bytes)  |
 +------------------+------------------+------------------------------------+
-```
-
-## Setup your serialization format
-
-First, you need to set up your serialization format. You can use any serialization format.
-
-Just define a struct with the name you want. This struct must implement [`native_model::Encode`](https://docs.rs/native_model/latest/native_model/trait.Encode.html) and [`native_model::Decode`](https://docs.rs/native_model/latest/native_model/trait.Decode.html) traits.
-
-In the below example we have created a struct `Bincode` that use the [bincode](https://docs.rs/bincode/latest/bincode/) crate:
-```rust,skt-define-serilization-format
-pub struct Bincode;
-
-impl<T: bincode::Encode> native_model::Encode<T> for Bincode {
-    type Error = bincode::error::EncodeError;
-    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
-        bincode::encode_to_vec(obj, bincode::config::standard())
-    }
-}
-
-impl<T: bincode::Decode> native_model::Decode<T> for Bincode {
-    type Error = bincode::error::DecodeError;
-    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
-        bincode::decode_from_slice(&data, bincode::config::standard()).map(|(result, _)| result)
-    }
-}
-```
-
-Full examples: 
-- [bincode with encode/decode](./tests/example/encode_decode/bincode.rs)
-- [bincode with serde](./tests/example/encode_decode/bincode_serde.rs)
-
-
-## Setup your data model
-
-Define your model using the macro [`native_model`](file:///home/vincentherlemont/IdeaProjects/native_model/target/doc/native_model/attr.native_model.html).
-
-Attributes:
-- `id = u32`: The unique identifier of the model.
-- `version = u32`: The version of the model.
-- `with = type`: The serialization format that you use for the Encode/Decode implementation. Setup [here](#setup-your-serialization-format).
-- `from = type`: Optional, the previous version of the model.
-    - `type`: The previous version of the model that you use for the From implementation.
-- `try_from = (type, error)`: Optional, the previous version of the model with error handling.
-    - `type`: The previous version of the model that you use for the TryFrom implementation.
-    - `error`: The error type that you use for the TryFrom implementation.
-
-```rust,skt-define-models
-use native_model::native_model;
-
-#[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 1, with = Bincode)]
-struct DotV1(u32, u32);
-
-#[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 2, with = Bincode, from = DotV1)]
-struct DotV2 {
-    name: String,
-    x: u64,
-    y: u64,
-}
-
-// Implement the conversion between versions From<DotV1> for DotV2 and From<DotV2> for DotV1.
-
-#[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 3, with = Bincode, try_from = (DotV2, anyhow::Error))]
-struct DotV3 {
-    name: String,
-    cord: Cord,
-}
-
-#[derive(Encode, Decode, PartialEq, Debug)]
-struct Cord {
-    x: u64,
-    y: u64,
-}
-
-// Implement the conversion between versions From<DotV2> for DotV3 and From<DotV3> for DotV2.
 ```
 
 Full example [here](tests/example/example_define_model.rs).
