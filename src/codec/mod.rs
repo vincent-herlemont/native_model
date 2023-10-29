@@ -1,5 +1,6 @@
 pub mod bincode_1_3;
 pub mod bincode_2_rc;
+pub mod postcard_1_0;
 
 /// Encode trait for your own encoding method.
 ///
