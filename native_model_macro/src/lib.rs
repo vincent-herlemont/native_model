@@ -16,7 +16,6 @@ use syn::token;
 use syn::{parse_macro_input, DeriveInput, LitInt, Path, Token};
 
 // Inspiration: https://docs.rs/syn/2.0.29/syn/meta/fn.parser.html#example-1
-#[derive(Default)]
 pub(crate) struct ModelAttributes {
     pub(crate) id: Option<LitInt>,
     pub(crate) version: Option<LitInt>,
@@ -26,6 +25,18 @@ pub(crate) struct ModelAttributes {
     pub(crate) from: Option<Path>,
     // (type, try_from::Error type)
     pub(crate) try_from: Option<(Path, Path)>,
+}
+
+impl        Default for ModelAttributes {
+    fn default() -> Self {
+        ModelAttributes {
+            id: None,
+            version: None,
+            with: Some(syn::parse_str::<Path>("native_model::bincode_1_3::Bincode").unwrap()),
+            from: None,
+            try_from: None,
+        }
+    }
 }
 
 impl ModelAttributes {
