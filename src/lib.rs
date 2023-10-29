@@ -15,13 +15,26 @@
 //!
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
 
+
+#[cfg(any(
+                     feature = "serde",
+                    feature = "bincode_1_3",
+                    feature = "bincode_2_rc",
+                    feature = "postcard_1_0"
+))]
 mod codec;
+
+#[cfg(any(
+                             feature = "serde",
+                            feature = "bincode_1_3",
+                            feature = "bincode_2_rc",
+                            feature = "postcard_1_0"
+))]
 pub use codec::*;
 mod header;
 mod model;
 pub mod wrapper;
 
-pub use codec::*;
 pub use model::*;
 
 /// Macro to generate a [`native_model`] implementation for a struct.

@@ -5,9 +5,16 @@ edition = "2021"
 
 [workspace]
 
-[dev-dependencies]
-native_model = { path = "../" }
-serde = { version = "1.0", features = ["derive"] }
-bincode = { version = "2.0.0-rc.3", features = ["serde"] }
+[dependencies]
+native_model = { path = "../", no-default-features = true }
+serde = { version = "1.0", features = ["derive"], optional = true }
+bincode = { version = "2.0.0-rc.3", features = ["serde"] ,  optional = true }
+postcard = { version = "1.0", features = ["alloc"], optional = true }
 anyhow = "1.0"
-postcard = { version = "1.0", features = ["alloc"] }
+
+
+[features]
+default = ["bincode_1_3"]
+bincode_1_3 = ["serde", "native_model/bincode_1_3"]
+bincode_2_rc = ["serde", "native_model/bincode_2_rc", "bincode"]
+postcard_1_0 = ["serde", "native_model/postcard_1_0", "postcard"]

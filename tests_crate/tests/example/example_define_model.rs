@@ -1,3 +1,4 @@
+#![cfg(feature = "bincode")]
 use bincode::{config, Decode, Encode};
 use native_model::native_model;
 
