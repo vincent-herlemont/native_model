@@ -17,7 +17,7 @@ impl<T: bincode::Decode> native_model::Decode<T> for Bincode {
     }
 }
 
-use native_model_macro::native_model;
+use native_model::native_model;
 
 #[derive(Encode, Decode, PartialEq, Debug)]
 #[native_model(id = 1, version = 1, with = Bincode)]
