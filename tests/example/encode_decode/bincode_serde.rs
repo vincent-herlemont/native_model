@@ -1,18 +1,34 @@
 use bincode;
 use serde::{Deserialize, Serialize};
 
-fn native_model_encode_body<T: Serialize>(
-    model: &T,
-) -> Result<Vec<u8>, bincode::error::EncodeError> {
-    {
-        bincode::serde::encode_to_vec(model, bincode::config::standard())
+// fn native_model_encode_body<T: Serialize>(
+//     model: &T,
+// ) -> Result<Vec<u8>, bincode::error::EncodeError> {
+//     {
+//         bincode::serde::encode_to_vec(model, bincode::config::standard())
+//     }
+// }
+//
+// fn native_model_decode_body<T: for<'a> Deserialize<'a>>(
+//     data: Vec<u8>,
+// ) -> Result<T, bincode::error::DecodeError> {
+//     {
+//         Ok(bincode::serde::decode_from_slice(&data, bincode::config::standard())?.0)
+//     }
+// }
+
+pub struct Bincode;
+
+impl<T: Serialize> native_model::Encode<T> for Bincode {
+    type Error = bincode::error::EncodeError;
+    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
+        bincode::serde::encode_to_vec(obj, bincode::config::standard())
     }
 }
 
-fn native_model_decode_body<T: for<'a> Deserialize<'a>>(
-    data: Vec<u8>,
-) -> Result<T, bincode::error::DecodeError> {
-    {
+impl<T: for<'a> Deserialize<'a>> native_model::Decode<T> for Bincode {
+    type Error = bincode::error::DecodeError;
+    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
         Ok(bincode::serde::decode_from_slice(&data, bincode::config::standard())?.0)
     }
 }
@@ -20,7 +36,7 @@ fn native_model_decode_body<T: for<'a> Deserialize<'a>>(
 use native_model_macro::native_model;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-#[native_model(id = 1, version = 1)]
+#[native_model(id = 1, version = 1, with = Bincode)]
 struct DotV1(u32, u32);
 
 #[test]
