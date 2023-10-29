@@ -1,10 +1,9 @@
-use native_model::{native_model};
+use native_model::native_model;
 use serde::Deserialize;
 use serde::Serialize;
 
-#[derive(Serialize)]
-#[derive(Deserialize, PartialEq, Debug)]
-#[native_model(id = 1, version = 1, with = native_model::postcard_1_0::PostCard)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 1)]
 struct Example {
     a: u32,
     b: u32,
