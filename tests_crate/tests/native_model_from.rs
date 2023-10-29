@@ -1,5 +1,5 @@
 use bincode::{config, Decode, Encode};
-use native_model_macro::native_model;
+use native_model::native_model;
 pub struct Bincode;
 impl<T: bincode::Encode> native_model::Encode<T> for Bincode {
     type Error = bincode::error::EncodeError;
