@@ -100,21 +100,28 @@ Under the hood, the native model is a thin wrapper around serialized data. The `
 
 First, you need to set up your serialization format. You can use any serialization format.
 
-Just define the following functions, so they must be imported in the scope where you use the native model.
+Just define a struct with the name you want. This struct must implement [`native_model::Encode`](https://docs.rs/native_model/latest/native_model/trait.Encode.html) and [`native_model::Decode`](https://docs.rs/native_model/latest/native_model/trait.Decode.html) traits.
 
-```rust,ignore
-fn native_model_encode_body<T>(obj: &T) -> Result<Vec<u8>, E> {
-   ...
+In the below example we have created a struct `Bincode` that use the [bincode](https://docs.rs/bincode/latest/bincode/) crate:
+```rust,skt-define-serilization-format
+pub struct Bincode;
+
+impl<T: bincode::Encode> native_model::Encode<T> for Bincode {
+    type Error = bincode::error::EncodeError;
+    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
+        bincode::encode_to_vec(obj, bincode::config::standard())
+    }
 }
 
-fn native_model_decode_body<T>(data: Vec<u8>) -> Result<T, E> {
-   ...
+impl<T: bincode::Decode> native_model::Decode<T> for Bincode {
+    type Error = bincode::error::DecodeError;
+    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
+        bincode::decode_from_slice(&data, bincode::config::standard()).map(|(result, _)| result)
+    }
 }
 ```
 
-With `T` and `E` the type depending on the serialization format you use. Just `E` need to implement the `std::error::Error` trait.
-
-Examples: 
+Full examples: 
 - [bincode with encode/decode](./tests/example/encode_decode/bincode.rs)
 - [bincode with serde](./tests/example/encode_decode/bincode_serde.rs)
 
@@ -126,6 +133,7 @@ Define your model using the macro [`native_model`](file:///home/vincentherlemont
 Attributes:
 - `id = u32`: The unique identifier of the model.
 - `version = u32`: The version of the model.
+- `with = type`: The serialization format that you use for the Encode/Decode implementation. Setup [here](#setup-your-serialization-format).
 - `from = type`: Optional, the previous version of the model.
     - `type`: The previous version of the model that you use for the From implementation.
 - `try_from = (type, error)`: Optional, the previous version of the model with error handling.
@@ -136,11 +144,11 @@ Attributes:
 use native_model::native_model;
 
 #[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 1)]
+#[native_model(id = 1, version = 1, with = Bincode)]
 struct DotV1(u32, u32);
 
 #[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 2, from = DotV1)]
+#[native_model(id = 1, version = 2, with = Bincode, from = DotV1)]
 struct DotV2 {
     name: String,
     x: u64,
@@ -150,7 +158,7 @@ struct DotV2 {
 // Implement the conversion between versions From<DotV1> for DotV2 and From<DotV2> for DotV1.
 
 #[derive(Encode, Decode, PartialEq, Debug)]
-#[native_model(id = 1, version = 3, try_from = (DotV2, anyhow::Error))]
+#[native_model(id = 1, version = 3, with = Bincode, try_from = (DotV2, anyhow::Error))]
 struct DotV3 {
     name: String,
     cord: Cord,

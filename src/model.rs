@@ -5,7 +5,6 @@ pub trait Model: Sized {
     fn native_model_version() -> u32;
 
     // --------------- Decode ---------------
-
     fn native_model_decode_body(data: Vec<u8>, id: u32) -> DecodeResult<Self>
     where
         Self: Sized;

@@ -1,22 +1,27 @@
 use bincode::{config, Decode, Encode};
 use native_model_macro::native_model;
-
-fn native_model_encode_body<T: Encode>(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
-    bincode::encode_to_vec(obj, config::standard())
+pub struct Bincode;
+impl<T: bincode::Encode> native_model::Encode<T> for Bincode {
+    type Error = bincode::error::EncodeError;
+    fn encode(obj: &T) -> Result<Vec<u8>, bincode::error::EncodeError> {
+        bincode::encode_to_vec(obj, config::standard())
+    }
 }
 
-fn native_model_decode_body<T: Decode>(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
-    bincode::decode_from_slice(&data, config::standard()).map(|(result, _)| result)
+impl<T: bincode::Decode> native_model::Decode<T> for Bincode {
+    type Error = bincode::error::DecodeError;
+    fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
+        bincode::decode_from_slice(&data, config::standard()).map(|(result, _)| result)
+    }
 }
-
 #[derive(Debug, Encode, Decode, PartialEq)]
-#[native_model(id = 1, version = 1)]
+#[native_model(id = 1, version = 1, with = Bincode)]
 struct Foo1 {
     x: i32,
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
-#[native_model(id = 1, version = 2, from = Foo1)]
+#[native_model(id = 1, version = 2, with = Bincode, from = Foo1)]
 struct Foo2 {
     x: i32,
     c: char,
