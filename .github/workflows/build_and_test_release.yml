@@ -22,10 +22,13 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           override: true
       - uses: extractions/setup-just@v1
-      - name: Ls
-        run: ls -al
+      - uses: hustcer/setup-nu@v3.7
+        with:
+          version: '0.85'
+      - name: Just version
+        run: just --version
       - name: Build
-        run: just
+        run: just build_all
   release:
     name: Release
     runs-on: ubuntu-latest
