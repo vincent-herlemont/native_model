@@ -15,29 +15,29 @@
 //!
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
 
-
 #[cfg(any(
-                     feature = "serde",
-                    feature = "bincode_1_3",
-                    feature = "bincode_2_rc",
-                    feature = "postcard_1_0"
+    feature = "serde",
+    feature = "bincode_1_3",
+    feature = "bincode_2_rc",
+    feature = "postcard_1_0"
 ))]
 mod codec;
 
 #[cfg(any(
-                             feature = "serde",
-                            feature = "bincode_1_3",
-                            feature = "bincode_2_rc",
-                            feature = "postcard_1_0"
+    feature = "serde",
+    feature = "bincode_1_3",
+    feature = "bincode_2_rc",
+    feature = "postcard_1_0"
 ))]
 pub use codec::*;
 mod header;
-mod model;
+pub mod model;
 pub mod wrapper;
 
+// Re-export
 pub use model::*;
 
-/// Macro to generate a [`native_model`] implementation for a struct.
+// Macro to generate a [`native_model`] implementation for a struct.
 pub use native_model_macro::*;
 
 use wrapper::*;
@@ -114,7 +114,7 @@ pub struct DowngradeError {
 /// See examples:
 ///    - [README.md](https://github.com/vincent-herlemont/native_model) file.
 ///    - other [examples](https://github.com/vincent-herlemont/native_model/tree/master/tests/example)
-pub fn encode<T: Model>(model: &T) -> Result<Vec<u8>> {
+pub fn encode<T: crate::Model>(model: &T) -> Result<Vec<u8>> {
     T::native_model_encode(model)
 }
 
@@ -122,7 +122,7 @@ pub fn encode<T: Model>(model: &T) -> Result<Vec<u8>> {
 /// See examples:
 ///    - [README.md](https://github.com/vincent-herlemont/native_model) file.
 ///    - other [examples](https://github.com/vincent-herlemont/native_model/tree/master/tests/example)
-pub fn encode_downgrade<T: Model>(model: T, version: u32) -> Result<Vec<u8>> {
+pub fn encode_downgrade<T: crate::Model>(model: T, version: u32) -> Result<Vec<u8>> {
     T::native_model_encode_downgrade(model, version)
 }
 
@@ -130,6 +130,6 @@ pub fn encode_downgrade<T: Model>(model: T, version: u32) -> Result<Vec<u8>> {
 /// See examples:
 ///    - [README.md](https://github.com/vincent-herlemont/native_model) file.
 ///    - other [examples](https://github.com/vincent-herlemont/native_model/tree/master/tests/example)
-pub fn decode<T: Model>(data: Vec<u8>) -> Result<(T, u32)> {
+pub fn decode<T: crate::Model>(data: Vec<u8>) -> Result<(T, u32)> {
     T::native_model_decode(data)
 }
