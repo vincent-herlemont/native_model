@@ -8,6 +8,10 @@ pub(crate) fn generate_native_model_version(model_attributes: &ModelAttributes) 
         fn native_model_version() -> u32 {
             #native_model_version
         }
+
+        fn native_model_version_str() -> &'static str {
+            stringify!(#native_model_version)
+        }
     };
     gen
 }

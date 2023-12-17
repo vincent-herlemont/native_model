@@ -28,10 +28,19 @@ impl From<Foo2> for Foo1 {
 }
 
 #[test]
-fn test_simple() {
+fn get_id_version_int() {
     assert_eq!(Foo1::native_model_id(), 1);
     assert_eq!(Foo1::native_model_version(), 1);
 
     assert_eq!(Foo2::native_model_id(), 1);
     assert_eq!(Foo2::native_model_version(), 2);
+}
+
+#[test]
+fn get_id_version_str() {
+    assert_eq!(Foo1::native_model_id_str(), "1");
+    assert_eq!(Foo1::native_model_version_str(), "1");
+
+    assert_eq!(Foo2::native_model_id_str(), "1");
+    assert_eq!(Foo2::native_model_version_str(), "2");
 }
