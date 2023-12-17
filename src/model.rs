@@ -2,7 +2,9 @@ use crate::{DecodeResult, EncodeResult, Result};
 
 pub trait Model: Sized {
     fn native_model_id() -> u32;
+    fn native_model_id_str() -> &'static str;
     fn native_model_version() -> u32;
+    fn native_model_version_str() -> &'static str;
 
     // --------------- Decode ---------------
     fn native_model_decode_body(data: Vec<u8>, id: u32) -> DecodeResult<Self>
