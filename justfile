@@ -51,7 +51,10 @@ test_bincode_2_rc:
 test_postcard_1_0:
     @just _tests_crate '--features postcard_1_0'
 
-test_all: test_no_default test_default test_bincode_1_3 test_bincode_2_rc test_postcard_1_0
+test_docs:
+    cargo test --doc --features bincode_2_rc
+
+test_all: test_docs test_no_default test_default test_bincode_1_3 test_bincode_2_rc test_postcard_1_0
 
 bench_overhead:
     cargo bench --bench overhead
