@@ -165,7 +165,7 @@ Full example [here](tests/example/example_define_model.rs).
 
 Native model has
 been designed to have a minimal and constant overhead. That means that the overhead is the same
-whatever the size of the data. Under the wood we use the [zerocopy](https://docs.rs/zerocopy/latest/zerocopy/) crate 
+whatever the size of the data. Under the hood we use the [zerocopy](https://docs.rs/zerocopy/latest/zerocopy/) crate 
 to avoid unnecessary copies.
 
 👉 To know the total time of the encode/decode, you need to add the time of your serialization format.
