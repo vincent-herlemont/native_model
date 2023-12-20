@@ -79,8 +79,8 @@ changes, the default serialization format is the oldest one.
 Define a struct with the name you want. This struct must implement [`native_model::Encode`](https://docs.rs/native_model/latest/native_model/trait.Encode.html) and [`native_model::Decode`](https://docs.rs/native_model/latest/native_model/trait.Decode.html) traits.
 
 Full examples: 
-- [bincode with encode/decode](./tests_crate/tests/example/encode_decode/bincode.rs)
-- [bincode with serde](./tests_crate/tests/example/encode_decode/bincode_serde.rs)
+- [bincode with encode/decode](./tests_crate/tests/example/custom_codec/bincode.rs)
+- [bincode with serde](./tests_crate/tests/example/custom_codec/bincode_serde.rs)
 
 Others examples,  see the default implementations:
 - [bincode v1.3](./src/codec/bincode_1_3.rs)
