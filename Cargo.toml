@@ -15,7 +15,7 @@ categories = ["data-structures", "encoding", "rust-patterns"]
 members = ["native_model_macro"]
 
 [dependencies]
-zerocopy = { version = "0.7.32", features = [ "derive"] }
+zerocopy = { version = "0.7.33", features = [ "derive"] }
 thiserror = "1.0.59"
 anyhow = "1.0.82"
 native_model_macro = { version = "0.4.18", path = "native_model_macro" }
