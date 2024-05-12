@@ -14,12 +14,19 @@
 //!   - The crate is in early development, and performance is expected to improve over time.
 //!
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
+//!
+//! You may also want to check [David Koloski](https://github.com/djkoloski)'s
+//! [Rust serialization benchmarks](https://github.com/djkoloski/rust_serialization_benchmark)
+//! for help selecting the codec right for your project.
+
+#![feature(doc_cfg)]
 
 #[cfg(any(
     feature = "serde",
     feature = "bincode_1_3",
     feature = "bincode_2_rc",
-    feature = "postcard_1_0"
+    feature = "postcard_1_0",
+    doc
 ))]
 mod codec;
 
@@ -27,7 +34,8 @@ mod codec;
     feature = "serde",
     feature = "bincode_1_3",
     feature = "bincode_2_rc",
-    feature = "postcard_1_0"
+    feature = "postcard_1_0",
+    doc
 ))]
 pub use codec::*;
 mod header;
@@ -187,7 +195,6 @@ pub trait Model: Sized {
     where
         Self: Sized,
     {
-        let version = version.clone();
         let mut data = self.native_model_encode_downgrade_body(version)?;
         let data = crate::native_model_encode(&mut data, Self::native_model_id(), version);
         Ok(data)
