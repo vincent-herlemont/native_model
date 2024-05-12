@@ -170,7 +170,7 @@ native_model = { version = "0.4", features = [ "rmp_serde_1_3" ] }
 
 ```rust,no_run
 use serde::{Deserialize, Serialize};
-use crate::native_model;
+use native_model::native_model;
 
 #[derive(Clone, Default, Deserialize, Serialize)]
 #[native_model(id = 1, version = 1, with = native_model::rmp_serde_1_3::RmpSerde)]
