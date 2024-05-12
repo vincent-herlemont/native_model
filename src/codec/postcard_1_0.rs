@@ -1,10 +1,9 @@
-//! ⚠️ [`Read the docs before using`](crate::postcard_1_0::PostCard#warning) -
+//! [postcard 1.0](https://crates.io/crates/postcard/1.0.8) ·
 //! Enable the `postcard_1_0` feature and annotate your type with
-//! `native_model::postcard_1_0::PostCard` to have `native_db` use the postcard
-//! 1.0 crate for serializing & deserializing.
+//! `native_model::postcard_1_0::PostCard` to have `native_db` use this crate.
 
-/// Used to specify the [postcard](https://crates.io/crates/postcard/1.0.8)
-/// `1.0` crate for serialization & deserialization.
+/// Used to specify the [postcard 1.0](https://crates.io/crates/postcard/1.0.8)
+/// crate for serialization & deserialization.
 ///
 /// # Warning
 ///

@@ -1,10 +1,11 @@
-//! ⚠️ [`Read the docs before using`](crate::bincode_2_rc::Bincode#warning) -
+//! [bincode 2.0.0-rc.3](https://crates.io/crates/bincode/2.0.0-rc.3) ·
 //! Enable the `bincode_2_rc` feature and annotate your type with
-//! `native_model::bincode_2_rc::Bincode` to have `native_db` use the bincode
-//! 2.0.0-rc.3 crate for serializing & deserializing.
+//! `native_model::bincode_2_rc::Bincode` to have `native_db` use this crate for
+//! serializing & deserializing.
 
-/// Used to specify the [bincode](https://crates.io/crates/bincode/2.0.0-rc.3)
-/// `2.0.0-rc.3` crate for serialization & deserialization.
+/// Used to specify the
+/// [bincode 2.0.0-rc.3](https://crates.io/crates/bincode/2.0.0-rc.3)
+/// crate for serialization & deserialization.
 ///
 /// # Warning
 ///

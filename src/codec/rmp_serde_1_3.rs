@@ -1,10 +1,11 @@
+//! [rmp-serde 1.3](https://crates.io/crates/rmp-serde/1.3.0) ·
 //! Enable the `rmp_serde_1_3` feature and
 //! [`annotate your type`](crate::native_model) with
-//! `native_model::rmp_serde_1_3::RmpSerde` to have `native_db` use the
-//! rmp-serde 1.3 crate for serializing & deserializing.
+//! `native_model::rmp_serde_1_3::RmpSerde` to have `native_db` use this crate.
 
-/// Used to specify the [rmp-serde](https://crates.io/crates/rmp-serde/1.3.0)
-/// `1.3` crate for serialization & deserialization.
+/// Used to specify the
+/// [rmp-serde 1.3](https://crates.io/crates/rmp-serde/1.3.0)
+/// crate for serialization & deserialization.
 ///
 /// # Basic usage
 ///

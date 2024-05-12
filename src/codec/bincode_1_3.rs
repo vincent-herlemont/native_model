@@ -1,9 +1,9 @@
-//! ⚠️ [`Read the docs before using`](crate::bincode_1_3::Bincode#warning) -
-//! Annotate your type with `native_model::bincode_1_3::Bincode` to have
-//! `native_db` use the bincode 1.3 crate for serializing & deserializing.
+//! [bincode 1.3](https://crates.io/crates/bincode/1.3.3) ·
+//! The default codec for serializing & deserializing.
 
-/// Used to specify the [bincode](https://crates.io/crates/bincode/1.3.3) `1.3`
-/// crate for serialization & deserialization.
+/// Used to specify that the
+/// [bincode 1.3](https://crates.io/crates/bincode/1.3.3) crate is to be used
+/// for serialization & deserialization.
 ///
 /// # Warning
 ///
