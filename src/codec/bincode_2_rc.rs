@@ -1,4 +1,4 @@
-//! ⚠️ [`Read the docs before using`](crate::bincode_2_rc::Bincode#warning).
+//! ⚠️ [`Read the docs before using`](crate::bincode_2_rc::Bincode#warning) -
 //! Annotate your type with `native_model::bincode_2_rc::Bincode` to use
 //! the bincode 2.0.0-rc.3 crate for serializing & deserializing.
 
