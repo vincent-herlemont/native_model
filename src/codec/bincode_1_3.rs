@@ -23,9 +23,9 @@
 ///
 /// ```rust,no_run
 /// # fn main() {
-/// # use serde::{Deserialize, Serialize};
-/// # use crate::native_model;
-/// #
+/// use serde::{Deserialize, Serialize};
+/// use native_model::native_model;
+///
 /// #[derive(Clone, Default, Deserialize, Serialize)]
 /// #[native_model(id = 1, version = 1, with = native_model::bincode_1_3::Bincode)]
 /// struct MyStruct {
