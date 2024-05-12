@@ -1,9 +1,14 @@
-#[cfg(all(feature = "serde", feature = "bincode_1_3"))]
+//! Traits and implementations for encoding types into a series of bytes and
+//! decoding bytes back into types.
+
+#[cfg(any(all(feature = "serde", feature = "bincode_1_3"), doc))]
 pub mod bincode_1_3;
-#[cfg(all(feature = "serde", feature = "bincode_2_rc"))]
+#[cfg(any(all(feature = "serde", feature = "bincode_2_rc"), doc))]
 pub mod bincode_2_rc;
-#[cfg(all(feature = "serde", feature = "postcard_1_0"))]
+#[cfg(any(all(feature = "serde", feature = "postcard_1_0"), doc))]
 pub mod postcard_1_0;
+#[cfg(any(all(feature = "serde", feature = "rmp_serde_1_3"), doc))]
+pub mod rmp_serde_1_3;
 
 /// Encode trait for your own encoding method.
 ///
