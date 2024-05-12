@@ -32,7 +32,8 @@ criterion = { version = "0.5.1" }
 skeptic = "0.13.7"
 
 [features]
-default = ["serde", "bincode_1_3"]
+# default = ["serde", "bincode_1_3"]
+default = ["serde", "bincode_1_3", "bincode_2_rc", "postcard_1_0", "rmp_serde_1_3"]
 
 [[bench]]
 name = "overhead"
