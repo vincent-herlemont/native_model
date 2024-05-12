@@ -14,7 +14,7 @@ pub mod rmp_serde_1_3;
 ///
 /// Example:
 /// ```rust
-///  use bincode_2_rc::{error::EncodeError,serde::encode_to_vec, config::standard};
+/// use bincode_2_rc::{error::EncodeError,serde::encode_to_vec, config::standard};
 /// use serde::Serialize;
 /// pub struct Bincode;
 ///
@@ -27,6 +27,12 @@ pub mod rmp_serde_1_3;
 /// ```
 pub trait Encode<T> {
     type Error;
+    /// Encodes a `T` type into a series of bytes.
+    ///
+    /// # Errors
+    ///
+    /// The errors returned from this function depend on the trait implementor
+    /// (the serializer), i.e. `bincode_2_rc`.
     fn encode(obj: &T) -> Result<Vec<u8>, Self::Error>;
 }
 
@@ -46,5 +52,11 @@ pub trait Encode<T> {
 /// }
 pub trait Decode<T> {
     type Error;
+    /// Decodes a series of bytes back into a `T` type.
+    ///
+    /// # Errors
+    ///
+    /// The errors returned from this function depend on the trait implementor
+    /// (the deserializer), i.e. `bincode_2_rc`.
     fn decode(data: Vec<u8>) -> Result<T, Self::Error>;
 }

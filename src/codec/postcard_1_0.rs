@@ -1,4 +1,4 @@
-//! ⚠️ [`Read the docs before using`](crate::postcard_1_0::PostCard#warning).
+//! ⚠️ [`Read the docs before using`](crate::postcard_1_0::PostCard#warning) -
 //! Annotate your type with `native_model::postcard_1_0::PostCard` to
 //! use the postcard 1.0 crate for serializing & deserializing.
 

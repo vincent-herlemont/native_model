@@ -17,7 +17,7 @@ impl<T: SplitByteSlice> Wrapper<T> {
         Some(native_model)
     }
 
-    pub fn value(&self) -> &T {
+    pub const fn value(&self) -> &T {
         &self.value
     }
 
