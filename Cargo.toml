@@ -10,6 +10,7 @@ readme = "README.md"
 build = "build.rs"
 keywords = ["serialization", "interoperability", "data-consistency", "flexibility", "performance"]
 categories = ["data-structures", "encoding", "rust-patterns"]
+rust-version = "1.73.0"
 
 [workspace]
 members = ["native_model_macro"]
