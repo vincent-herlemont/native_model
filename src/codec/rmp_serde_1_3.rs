@@ -15,7 +15,7 @@
 ///
 /// Example usage:
 ///
-/// ```rust,no_run
+/// ```no_run
 /// # fn main() {
 /// use serde::{Deserialize, Serialize};
 /// use native_model::native_model;
