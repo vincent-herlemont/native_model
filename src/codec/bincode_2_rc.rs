@@ -1,6 +1,7 @@
 //! ⚠️ [`Read the docs before using`](crate::bincode_2_rc::Bincode#warning) -
-//! Annotate your type with `native_model::bincode_2_rc::Bincode` to use
-//! the bincode 2.0.0-rc.3 crate for serializing & deserializing.
+//! Enable the `bincode_2_rc` feature and annotate your type with
+//! `native_model::bincode_2_rc::Bincode` to have `native_db` use the bincode
+//! 2.0.0-rc.3 crate for serializing & deserializing.
 
 /// Used to specify the [bincode](https://crates.io/crates/bincode/2.0.0-rc.3)
 /// `2.0.0-rc.3` crate for serialization & deserialization.
@@ -11,21 +12,25 @@
 /// all [serde](https://crates.io/crates/serde) features. Errors may be
 /// encountered when using this with some types.
 ///
+/// If you are encountering errors when using this codec on your types, try
+/// using the `rmp_serde_1_3` codec instead.
+///
 /// # Basic usage
 ///
-/// Use the [`with`](crate::native_model) attribute on your type to instruct
+/// After enabling the `bincode_2_rc` feature in your `Cargo.toml`, use the
+/// [`with`](crate::native_model) attribute on your type to instruct
 /// `native_model` to use `Bincode` for serialization & deserialization.
 ///
-/// Example:
+/// Example usage:
 ///
 /// ```rust
+/// #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
 /// #[native_model(id = 1, version = 1, with = native_model::bincode_2_rc::Bincode)]
 /// struct MyStruct {
 ///     my_string: String
 /// }
 /// ```
 
-#[doc(cfg(all(feature = "serde", feature = "bincode_2_rc")))]
 pub struct Bincode;
 
 #[cfg(all(feature = "serde", feature = "bincode_2_rc"))]
