@@ -24,12 +24,17 @@
 ///
 /// Example usage:
 ///
-/// ```rust
-/// #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
+/// ```rust,no_run
+/// # fn main() {
+/// # use serde::{Deserialize, Serialize};
+/// # use crate::native_model;
+/// #
+/// #[derive(Clone, Default, Deserialize, Serialize)]
 /// #[native_model(id = 1, version = 1, with = native_model::bincode_2_rc::Bincode)]
 /// struct MyStruct {
 ///     my_string: String
 /// }
+/// # }
 /// ```
 
 pub struct Bincode;

@@ -168,8 +168,11 @@ native_model = { version = "0.4", features = [ "rmp_serde_1_3" ] }
 
 2. Assign the `rmp_serde_1_3` codec to your `struct` using the `with` attribute:
 
-```rust
-#[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
+```rust,no_run
+use serde::{Deserialize, Serialize};
+use crate::native_model;
+
+#[derive(Clone, Default, Deserialize, Serialize)]
 #[native_model(id = 1, version = 1, with = native_model::rmp_serde_1_3::RmpSerde)]
 struct MyStruct {
 	my_string: String,
