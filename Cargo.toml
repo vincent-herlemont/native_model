@@ -15,10 +15,17 @@ categories = ["data-structures", "encoding", "rust-patterns"]
 members = ["native_model_macro"]
 
 [dependencies]
+<<<<<<< HEAD
 zerocopy = { version = "0.7.32", features = [ "derive"] }
 thiserror = "1.0"
 anyhow = "1.0"
 native_model_macro = { version = "0.4.11", path = "native_model_macro" }
+=======
+zerocopy = { version = "0.7.33", features = ["derive"] }
+thiserror = "1.0.59"
+anyhow = "1.0.82"
+native_model_macro = { version = "0.4.19", path = "native_model_macro" }
+>>>>>>> b6d3bd4 (Removed `#![feature(doc_cfg)]` nightly feature)
 
 serde = { version = "1.0", features = ["derive"], optional = true }
 bincode_1_3 = { package = "bincode", version = "1.3", optional = true }
