@@ -15,12 +15,64 @@
 //!
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
 //!
-//! You may also want to check [David Koloski](https://github.com/djkoloski)'s
+//! # Codecs
+//!
+//! `native_model` comes with several optional built-in serializer features
+//! available:
+//!
+//! - [bincode](https://crates.io/crates/bincode/1.3.3) `1.3` ·
+//! [`Annotate your type`](crate::native_model) with
+//! `native_model::bincode_1_3::Bincode` to have `native_db` use this default
+//! codec for serializing & deserializing. **Warning: This codec may not work
+//! with all serde-derived types.**
+//!
+//! - [bincode](https://crates.io/crates/bincode/2.0.0-rc.3) `2.0.0-rc.3` ·
+//! Enable the `bincode_2_rc` feature and use the
+//! `native_model::bincode_2_rc::Bincode` attribute to have `native_db` use this
+//! crate. **Warning: This codec may not work with all serde-derived types.**
+//!
+//! - [postcard](https://crates.io/crates/postcard/1.0.8) `1.0` ·
+//! Enable the `postcard_1_0` feature and use the
+//! `native_model::postcard_1_0::PostCard` attribute. **Warning: This codec may
+//! not work with all serde-derived types.**
+//!
+//! - [rmp-serde](https://crates.io/crates/rmp-serde/1.3.0) `1.3` ·
+//! Enable the `rmp_serde_1_3` feature and use the
+//! `native_model::rmp_serde_1_3::RmpSerde` attribute.
+//!
+//! ###### Codec example:
+//!
+//! As example, to use `rmp-serde`:
+//!
+//! 1. In your project's `Cargo.toml` file, enable the `rmp_serde_1_3` feature
+//! for the `native_model` dependency. Check
+//! [crates.io](https://crates.io/crates/native_model) for the most recent
+//! version number.
+//!
+//! ```toml
+//! [dependencies]
+//! serde = { version = "1.0", features = [ "derive" ] }
+//! native_model = { version = "0.4", features = [ "rmp_serde_1_3" ] }
+//! ```
+//!
+//! 2. Assign the `rmp_serde_1_3` codec to your type using the `with` attribute:
+//!
+//! ```rust
+//! #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
+//! #[native_model(id = 1, version = 1, with = native_model::rmp_serde_1_3::RmpSerde)]
+//! struct MyStruct {
+//!     my_string: String,
+//!     // etc.
+//! }
+//! ```
+//!
+//! ###### Additional reading
+//!
+//! You may also want to check out
+//! [David Koloski](https://github.com/djkoloski)'s
 //! [Rust serialization benchmarks](https://github.com/djkoloski/rust_serialization_benchmark)
 //! for help selecting the codec (i.e. `bincode_1_3`, `rmp_serde_1_3`, etc.)
 //! that's best for your project.
-
-#![feature(doc_cfg)]
 
 #[cfg(any(
     feature = "serde",
