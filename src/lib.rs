@@ -20,11 +20,9 @@
 //! `native_model` comes with several optional built-in serializer features
 //! available:
 //!
-//! - [bincode](https://crates.io/crates/bincode/1.3.3) `1.3` ·
-//! [`Annotate your type`](crate::native_model) with
-//! `native_model::bincode_1_3::Bincode` to have `native_db` use this default
-//! codec for serializing & deserializing. **Warning: This codec may not work
-//! with all serde-derived types.**
+//! - [bincode](https://crates.io/crates/bincode/1.3.3) `1.3` · This is the
+//! default codec. **Warning: This codec may not work with all serde-derived
+//! types.**
 //!
 //! - [bincode](https://crates.io/crates/bincode/2.0.0-rc.3) `2.0.0-rc.3` ·
 //! Enable the `bincode_2_rc` feature and use the
@@ -45,9 +43,9 @@
 //! As example, to use `rmp-serde`:
 //!
 //! 1. In your project's `Cargo.toml` file, enable the `rmp_serde_1_3` feature
-//! for the `native_model` dependency. Check
-//! [crates.io](https://crates.io/crates/native_model) for the most recent
-//! version number.
+//! for the `native_model` dependency. Be sure to check `crates.io` for the most
+//! recent [`native_model`](https://crates.io/crates/native_model) version
+//! number.
 //!
 //! ```toml
 //! [dependencies]
