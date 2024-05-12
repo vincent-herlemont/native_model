@@ -17,7 +17,8 @@
 //!
 //! You may also want to check [David Koloski](https://github.com/djkoloski)'s
 //! [Rust serialization benchmarks](https://github.com/djkoloski/rust_serialization_benchmark)
-//! for help selecting the codec right for your project.
+//! for help selecting the codec (i.e. `bincode_1_3`, `rmp_serde_1_3`, etc.)
+//! that's best for your project.
 
 #![feature(doc_cfg)]
 
@@ -26,6 +27,7 @@
     feature = "bincode_1_3",
     feature = "bincode_2_rc",
     feature = "postcard_1_0",
+    feature = "rmp_serde_1_3",
     doc
 ))]
 mod codec;
@@ -35,6 +37,7 @@ mod codec;
     feature = "bincode_1_3",
     feature = "bincode_2_rc",
     feature = "postcard_1_0",
+    feature = "rmp_serde_1_3",
     doc
 ))]
 pub use codec::*;
@@ -118,6 +121,11 @@ pub struct DowngradeError {
 /// See examples:
 ///    - [README.md](https://github.com/vincent-herlemont/native_model) file.
 ///    - other [examples](https://github.com/vincent-herlemont/native_model/tree/master/tests/example)
+///
+/// # Errors
+///
+/// The errors returned from this function depend on the [`Encode`] trait
+/// implementor (the serializer), i.e. `bincode_2_rc`.
 pub fn encode<T: crate::Model>(model: &T) -> Result<Vec<u8>> {
     T::native_model_encode(model)
 }
@@ -134,6 +142,11 @@ pub fn encode_downgrade<T: crate::Model>(model: T, version: u32) -> Result<Vec<u
 /// See examples:
 ///    - [README.md](https://github.com/vincent-herlemont/native_model) file.
 ///    - other [examples](https://github.com/vincent-herlemont/native_model/tree/master/tests/example)
+///
+/// # Errors
+///
+/// The errors returned from this function depend on the [`Decode`] trait
+/// implementor (the deserializer), i.e. `bincode_2_rc`.
 pub fn decode<T: crate::Model>(data: Vec<u8>) -> Result<(T, u32)> {
     T::native_model_decode(data)
 }
@@ -145,18 +158,11 @@ pub trait Model: Sized {
     fn native_model_version_str() -> &'static str;
 
     // --------------- Decode ---------------
-    fn native_model_decode_body(data: Vec<u8>, id: u32) -> DecodeResult<Self>
-    where
-        Self: Sized;
+    fn native_model_decode_body(data: Vec<u8>, id: u32) -> DecodeResult<Self>;
 
-    fn native_model_decode_upgrade_body(data: Vec<u8>, id: u32, version: u32) -> Result<Self>
-    where
-        Self: Sized;
+    fn native_model_decode_upgrade_body(data: Vec<u8>, id: u32, version: u32) -> Result<Self>;
 
-    fn native_model_decode(data: Vec<u8>) -> Result<(Self, u32)>
-    where
-        Self: Sized,
-    {
+    fn native_model_decode(data: Vec<u8>) -> Result<(Self, u32)> {
         let native_model = crate::Wrapper::deserialize(&data[..]).unwrap();
         let source_id = native_model.get_id();
         let source_version = native_model.get_version();
@@ -170,18 +176,11 @@ pub trait Model: Sized {
 
     // --------------- Encode ---------------
 
-    fn native_model_encode_body(&self) -> EncodeResult<Vec<u8>>
-    where
-        Self: Sized;
+    fn native_model_encode_body(&self) -> EncodeResult<Vec<u8>>;
 
-    fn native_model_encode_downgrade_body(self, version: u32) -> Result<Vec<u8>>
-    where
-        Self: Sized;
+    fn native_model_encode_downgrade_body(self, version: u32) -> Result<Vec<u8>>;
 
-    fn native_model_encode(&self) -> Result<Vec<u8>>
-    where
-        Self: Sized,
-    {
+    fn native_model_encode(&self) -> Result<Vec<u8>> {
         let mut data = self.native_model_encode_body()?;
         let data = crate::native_model_encode(
             &mut data,
@@ -191,10 +190,7 @@ pub trait Model: Sized {
         Ok(data)
     }
 
-    fn native_model_encode_downgrade(self, version: u32) -> Result<Vec<u8>>
-    where
-        Self: Sized,
-    {
+    fn native_model_encode_downgrade(self, version: u32) -> Result<Vec<u8>> {
         let mut data = self.native_model_encode_downgrade_body(version)?;
         let data = crate::native_model_encode(&mut data, Self::native_model_id(), version);
         Ok(data)
