@@ -1,15 +1,20 @@
-#[cfg(all(feature = "serde", feature = "bincode_1_3"))]
+//! Traits and implementations for encoding types into a series of bytes and
+//! decoding bytes back into types.
+
+#[cfg(any(all(feature = "serde", feature = "bincode_1_3"), doc))]
 pub mod bincode_1_3;
-#[cfg(all(feature = "serde", feature = "bincode_2_rc"))]
+#[cfg(any(all(feature = "serde", feature = "bincode_2_rc"), doc))]
 pub mod bincode_2_rc;
-#[cfg(all(feature = "serde", feature = "postcard_1_0"))]
+#[cfg(any(all(feature = "serde", feature = "postcard_1_0"), doc))]
 pub mod postcard_1_0;
+#[cfg(any(all(feature = "serde", feature = "rmp_serde_1_3"), doc))]
+pub mod rmp_serde_1_3;
 
 /// Encode trait for your own encoding method.
 ///
 /// Example:
 /// ```rust
-///  use bincode_2_rc::{error::EncodeError,serde::encode_to_vec, config::standard};
+/// use bincode_2_rc::{error::EncodeError,serde::encode_to_vec, config::standard};
 /// use serde::Serialize;
 /// pub struct Bincode;
 ///
@@ -22,6 +27,12 @@ pub mod postcard_1_0;
 /// ```
 pub trait Encode<T> {
     type Error;
+    /// Encodes a `T` type into a series of bytes.
+    ///
+    /// # Errors
+    ///
+    /// The errors returned from this function depend on the trait implementor
+    /// (the serializer), i.e. `bincode_2_rc`.
     fn encode(obj: &T) -> Result<Vec<u8>, Self::Error>;
 }
 
@@ -41,5 +52,11 @@ pub trait Encode<T> {
 /// }
 pub trait Decode<T> {
     type Error;
+    /// Decodes a series of bytes back into a `T` type.
+    ///
+    /// # Errors
+    ///
+    /// The errors returned from this function depend on the trait implementor
+    /// (the deserializer), i.e. `bincode_2_rc`.
     fn decode(data: Vec<u8>) -> Result<T, Self::Error>;
 }
