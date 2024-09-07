@@ -22,7 +22,7 @@ jobs:
           toolchain: ${{ matrix.toolchain }}
           override: true
       - uses: extractions/setup-just@v2
-      - uses: hustcer/setup-nu@v3.12
+      - uses: hustcer/setup-nu@v3.13
         with:
           version: '0.85'
       - name: Just version
