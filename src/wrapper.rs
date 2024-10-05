@@ -1,16 +1,15 @@
 use crate::header::Header;
 use zerocopy::little_endian::U32;
-use zerocopy::{AsBytes, ByteSlice, ByteSliceMut, Ref};
+use zerocopy::{SplitByteSlice, SplitByteSliceMut, Ref, IntoBytes};
 
-#[derive(Debug)]
-pub struct Wrapper<T: ByteSlice> {
-    header: Ref<T, Header>, // Deprecated: Rename LayoutVerified to Ref #203
+pub struct Wrapper<T: SplitByteSlice> {
+    header: Ref<T, Header>,
     value: T,
 }
 
-impl<T: ByteSlice> Wrapper<T> {
+impl<T: SplitByteSlice> Wrapper<T> {
     pub fn deserialize(packed: T) -> Option<Self> {
-        let (header_lv, rest) = Ref::<_, Header>::new_from_prefix(packed)?;
+        let (header_lv, rest) = Ref::<_, Header>::from_prefix(packed).ok()?;
         let native_model = Self {
             header: header_lv,
             value: rest,
@@ -35,7 +34,7 @@ impl<T: ByteSlice> Wrapper<T> {
     }
 }
 
-impl<T: ByteSliceMut> Wrapper<T> {
+impl<T: SplitByteSliceMut> Wrapper<T> {
     pub fn set_type_id(&mut self, type_id: u32) {
         self.header.id = U32::new(type_id);
     }

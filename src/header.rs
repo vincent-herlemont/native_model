@@ -1,7 +1,7 @@
 use zerocopy::little_endian::U32;
-use zerocopy::{AsBytes, FromBytes, FromZeroes};
+use zerocopy::{FromBytes, Immutable, IntoBytes, KnownLayout};
 
-#[derive(FromZeroes, FromBytes, AsBytes, Debug)]
+#[derive(FromBytes, IntoBytes, Immutable, KnownLayout, Debug)]
 #[repr(C)]
 pub struct Header {
     pub(crate) id: U32,
