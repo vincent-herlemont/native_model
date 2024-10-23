@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         toolchain: [stable]
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -41,7 +41,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           ref: main
 
