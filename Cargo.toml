@@ -16,7 +16,7 @@ members = ["native_model_macro"]
 
 [dependencies]
 zerocopy = { version = "0.8.0", features = [ "derive"] }
-thiserror = "1.0.59"
+thiserror = "2.0.0"
 anyhow = "1.0.82"
 native_model_macro = { version = "0.4.20", path = "native_model_macro" }
 
