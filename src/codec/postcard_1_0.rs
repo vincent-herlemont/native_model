@@ -22,6 +22,7 @@
 /// Example usage:
 ///
 /// ```rust
+/// # use native_model::*;
 /// #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
 /// #[native_model(id = 1, version = 1, with = native_model::postcard_1_0::PostCard)]
 /// struct MyStruct {
