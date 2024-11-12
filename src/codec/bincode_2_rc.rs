@@ -25,6 +25,7 @@
 /// Example usage:
 ///
 /// ```rust
+/// # use native_model::*;
 /// #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
 /// #[native_model(id = 1, version = 1, with = native_model::bincode_2_rc::Bincode)]
 /// struct MyStruct {
@@ -39,10 +40,7 @@ impl<T: serde::Serialize> super::Encode<T> for Bincode {
     type Error = bincode_2_rc::error::EncodeError;
     /// Serializes a type into bytes using the `bincode` `2.0.0-rc.3` crate.
     fn encode(obj: &T) -> Result<Vec<u8>, Self::Error> {
-        bincode_2_rc::serde::encode_to_vec(
-            obj,
-            bincode_2_rc::config::standard()
-        )
+        bincode_2_rc::serde::encode_to_vec(obj, bincode_2_rc::config::standard())
     }
 }
 
@@ -51,9 +49,6 @@ impl<T: for<'de> serde::Deserialize<'de>> super::Decode<T> for Bincode {
     type Error = bincode_2_rc::error::DecodeError;
     /// Deserializes a type from bytes using the `bincode` `2.0.0-rc.3` crate.
     fn decode(data: Vec<u8>) -> Result<T, Self::Error> {
-        Ok(bincode_2_rc::serde::decode_from_slice(
-            &data,
-            bincode_2_rc::config::standard()
-        )?.0)
+        Ok(bincode_2_rc::serde::decode_from_slice(&data, bincode_2_rc::config::standard())?.0)
     }
 }
