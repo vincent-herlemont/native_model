@@ -73,6 +73,7 @@ changes, the default serialization format is the oldest one.
 - `bincode_1_3`: [bincode](https://docs.rs/bincode/1.3.3/bincode/) v1.3 (default)
 - `bincode_2_rc`: [bincode](https://docs.rs/bincode/2.0.0-rc.3/bincode/) v2.0.0-rc3
 - `postcard_1_0`: [postcard](https://docs.rs/postcard/1.0.0/postcard/) v1.0
+- `rpm_serde_1_3`: [rmp-serde](https://docs.rs/rmp-serde/1.3.0/rmp_serde/) v1.3
 
 ### Custom serialization format
 
@@ -84,8 +85,25 @@ Full examples:
 
 Others examples,  see the default implementations:
 - [bincode v1.3](./src/codec/bincode_1_3.rs)
--  [bincode v2.0 (rc)](./src/codec/bincode_2_rc.rs)
--  [postcard v1.0](./src/codec/postcard_1_0.rs)
+- [bincode v2.0 (rc)](./src/codec/bincode_2_rc.rs)
+- [postcard v1.0](./src/codec/postcard_1_0.rs)
+- [rmp-serde v1.3](./src/codec/rmp_serde_1_3.rs)
+
+### Notice
+`native_model` provides implementations that rely on metadata-less formats and `serde`.
+There are known issues with some `serde` advanced features such as:
+
+- `#[serde(flatten)]`
+- `#[serde(skip)]`
+- `#[serde(skip_deserializing)]`
+- `#[serde(skip_serializing)]`
+- `#[serde(skip_serializing_if = "path")]`
+- `#[serde(tag = "...")]`
+- `#[serde(untagged)]`
+
+Or types implementing similar strategies such as [`serde_json::Value`][serde_json_value].
+
+[serde_json_value]: https://docs.rs/serde_json/latest/serde_json/enum.Value.html
 
 ## Data model
 
