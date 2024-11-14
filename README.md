@@ -19,7 +19,7 @@ See [concepts](#concepts) for more details.
 
 ## Usage
 
-```
+```text
        Application 1 (DotV1)        Application 2 (DotV1 and DotV2)
                 |                                  |
    Encode DotV1 |--------------------------------> | Decode DotV1 to DotV2
@@ -29,7 +29,38 @@ See [concepts](#concepts) for more details.
 ```
 
 
-```rust,skt-main
+```rust
+use native_model::native_model;
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 1)]
+struct DotV1(u32, u32);
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 2, from = DotV1)]
+struct DotV2 {
+    name: String,
+    x: u64,
+    y: u64,
+}
+
+impl From<DotV1> for DotV2 {
+    fn from(dot: DotV1) -> Self {
+        DotV2 {
+            name: "".to_string(),
+            x: dot.0 as u64,
+            y: dot.1 as u64,
+        }
+    }
+}
+
+impl From<DotV2> for DotV1 {
+    fn from(dot: DotV2) -> Self {
+        DotV1(dot.x as u32, dot.y as u32)
+    }
+}
+
 // Application 1
 let dot = DotV1(1, 2);
 let bytes = native_model::encode(&dot).unwrap();
@@ -54,7 +85,7 @@ let bytes = native_model::encode_downgrade(dot, source_version).unwrap();
 // Application 1
 let (dot, _) = native_model::decode::<DotV1>(bytes).unwrap();
 assert_eq!(dot, DotV1(5, 2));
- ```
+```
 
  - Full example [here](./tests_crate/tests/example/example_main.rs).
 
@@ -121,8 +152,9 @@ Attributes:
     - `type`: The previous version of the model that you use for the TryFrom implementation.
     - `error`: The error type that you use for the TryFrom implementation.
 
-```rust,skt-define-models
+```rust
 use native_model::native_model;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 #[native_model(id = 1, version = 1)]
@@ -138,6 +170,22 @@ struct DotV2 {
 
 // Implement the conversion between versions From<DotV1> for DotV2 and From<DotV2> for DotV1.
 
+impl From<DotV1> for DotV2 {
+    fn from(dot: DotV1) -> Self {
+        DotV2 {
+            name: "".to_string(),
+            x: dot.0 as u64,
+            y: dot.1 as u64,
+        }
+    }
+}
+
+impl From<DotV2> for DotV1 {
+    fn from(dot: DotV2) -> Self {
+        DotV1(dot.x as u32, dot.y as u32)
+    }
+}
+
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 #[native_model(id = 1, version = 3, try_from = (DotV2, anyhow::Error))]
 struct DotV3 {
@@ -152,6 +200,30 @@ struct Cord {
 }
 
 // Implement the conversion between versions From<DotV2> for DotV3 and From<DotV3> for DotV2.
+
+impl TryFrom<DotV2> for DotV3 {
+    type Error = anyhow::Error;
+
+    fn try_from(dot: DotV2) -> Result<Self, Self::Error> {
+        Ok(DotV3 {
+            name: dot.name,
+            cord: Cord { x: dot.x, y: dot.y },
+        })
+    }
+}
+
+impl TryFrom<DotV3> for DotV2 {
+    type Error = anyhow::Error;
+
+    fn try_from(dot: DotV3) -> Result<Self, Self::Error> {
+        Ok(DotV2 {
+            name: dot.name,
+            x: dot.cord.x,
+            y: dot.cord.y,
+        })
+    }
+}
+
 ```
 
 ## Codecs
@@ -189,6 +261,8 @@ native_model = { version = "0.4", features = [ "rmp_serde_1_3" ] }
 2. Assign the `rmp_serde_1_3` codec to your `struct` using the `with` attribute:
 
 ```rust
+use native_model::native_model;
+
 #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
 #[native_model(id = 1, version = 1, with = native_model::rmp_serde_1_3::RmpSerde)]
 struct MyStruct {
@@ -220,7 +294,7 @@ In order to understand how the native model works, you need to understand the fo
 
 Under the hood, the native model is a thin wrapper around serialized data. The `id` and the `version` are twice encoded with a [`little_endian::U32`](https://docs.rs/zerocopy/latest/zerocopy/byteorder/little_endian/type.U32.html). That represents 8 bytes, that are added at the beginning of the data.
 
-```
+``` text
 +------------------+------------------+------------------------------------+
 |     ID (4 bytes) | Version (4 bytes)| Data (indeterminate-length bytes)  |
 +------------------+------------------+------------------------------------+
