@@ -11,7 +11,7 @@ See [concepts](#concepts) for more details.
 
 ## Goals
 
-- **Interoperability**: Allows different applications to work together, even if they are using different 
+- **Interoperability**: Allows different applications to work together, even if they are using different
   versions of the data model.
 - **Data Consistency**: Ensure that we process the data expected model.
 - **Flexibility**: You can use any serialization format you want. More details [here](#setup-your-serialization-format).
@@ -19,7 +19,7 @@ See [concepts](#concepts) for more details.
 
 ## Usage
 
-```
+```text
        Application 1 (DotV1)        Application 2 (DotV1 and DotV2)
                 |                                  |
    Encode DotV1 |--------------------------------> | Decode DotV1 to DotV2
@@ -29,7 +29,38 @@ See [concepts](#concepts) for more details.
 ```
 
 
-```rust,skt-main
+```rust
+use native_model::native_model;
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 1)]
+struct DotV1(u32, u32);
+
+#[derive(Deserialize, Serialize, PartialEq, Debug)]
+#[native_model(id = 1, version = 2, from = DotV1)]
+struct DotV2 {
+    name: String,
+    x: u64,
+    y: u64,
+}
+
+impl From<DotV1> for DotV2 {
+    fn from(dot: DotV1) -> Self {
+        DotV2 {
+            name: "".to_string(),
+            x: dot.0 as u64,
+            y: dot.1 as u64,
+        }
+    }
+}
+
+impl From<DotV2> for DotV1 {
+    fn from(dot: DotV2) -> Self {
+        DotV1(dot.x as u32, dot.y as u32)
+    }
+}
+
 // Application 1
 let dot = DotV1(1, 2);
 let bytes = native_model::encode(&dot).unwrap();
@@ -39,10 +70,10 @@ let bytes = native_model::encode(&dot).unwrap();
 // Application 2
 // We are able to decode the bytes directly into a new type DotV2 (upgrade).
 let (mut dot, source_version) = native_model::decode::<DotV2>(bytes).unwrap();
-assert_eq!(dot, DotV2 { 
-    name: "".to_string(), 
-    x: 1, 
-    y: 2 
+assert_eq!(dot, DotV2 {
+    name: "".to_string(),
+    x: 1,
+    y: 2
 });
 dot.name = "Dot".to_string();
 dot.x = 5;
@@ -54,7 +85,7 @@ let bytes = native_model::encode_downgrade(dot, source_version).unwrap();
 // Application 1
 let (dot, _) = native_model::decode::<DotV1>(bytes).unwrap();
 assert_eq!(dot, DotV1(5, 2));
- ```
+```
 
  - Full example [here](./tests_crate/tests/example/example_main.rs).
 
@@ -78,7 +109,7 @@ changes, the default serialization format is the oldest one.
 
 Define a struct with the name you want. This struct must implement [`native_model::Encode`](https://docs.rs/native_model/latest/native_model/trait.Encode.html) and [`native_model::Decode`](https://docs.rs/native_model/latest/native_model/trait.Decode.html) traits.
 
-Full examples: 
+Full examples:
 - [bincode with encode/decode](./tests_crate/tests/example/custom_codec/bincode.rs)
 - [bincode with serde](./tests_crate/tests/example/custom_codec/bincode_serde.rs)
 
@@ -101,8 +132,9 @@ Attributes:
     - `type`: The previous version of the model that you use for the TryFrom implementation.
     - `error`: The error type that you use for the TryFrom implementation.
 
-```rust,skt-define-models
+```rust
 use native_model::native_model;
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 #[native_model(id = 1, version = 1)]
@@ -118,6 +150,22 @@ struct DotV2 {
 
 // Implement the conversion between versions From<DotV1> for DotV2 and From<DotV2> for DotV1.
 
+impl From<DotV1> for DotV2 {
+    fn from(dot: DotV1) -> Self {
+        DotV2 {
+            name: "".to_string(),
+            x: dot.0 as u64,
+            y: dot.1 as u64,
+        }
+    }
+}
+
+impl From<DotV2> for DotV1 {
+    fn from(dot: DotV2) -> Self {
+        DotV1(dot.x as u32, dot.y as u32)
+    }
+}
+
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 #[native_model(id = 1, version = 3, try_from = (DotV2, anyhow::Error))]
 struct DotV3 {
@@ -132,6 +180,30 @@ struct Cord {
 }
 
 // Implement the conversion between versions From<DotV2> for DotV3 and From<DotV3> for DotV2.
+
+impl TryFrom<DotV2> for DotV3 {
+    type Error = anyhow::Error;
+
+    fn try_from(dot: DotV2) -> Result<Self, Self::Error> {
+        Ok(DotV3 {
+            name: dot.name,
+            cord: Cord { x: dot.x, y: dot.y },
+        })
+    }
+}
+
+impl TryFrom<DotV3> for DotV2 {
+    type Error = anyhow::Error;
+
+    fn try_from(dot: DotV3) -> Result<Self, Self::Error> {
+        Ok(DotV2 {
+            name: dot.name,
+            x: dot.cord.x,
+            y: dot.cord.y,
+        })
+    }
+}
+
 ```
 
 ## Codecs
@@ -169,6 +241,8 @@ native_model = { version = "0.4", features = [ "rmp_serde_1_3" ] }
 2. Assign the `rmp_serde_1_3` codec to your `struct` using the `with` attribute:
 
 ```rust
+use native_model::native_model;
+
 #[derive(Clone, Default, serde::Deserialize, serde::Serialize)]
 #[native_model(id = 1, version = 1, with = native_model::rmp_serde_1_3::RmpSerde)]
 struct MyStruct {
@@ -189,9 +263,9 @@ Early development. Not ready for production.
 
 In order to understand how the native model works, you need to understand the following concepts.
 
-- **Identity**(`id`): The identity is the unique identifier of the model. It is used to identify the model and 
+- **Identity**(`id`): The identity is the unique identifier of the model. It is used to identify the model and
   prevent to decode a model into the wrong Rust type.
-- **Version**(`version`) The version is the version of the model. It is used to check the compatibility between two 
+- **Version**(`version`) The version is the version of the model. It is used to check the compatibility between two
   models.
 - **Encode**: The encode is the process of converting a model into a byte array.
 - **Decode**: The decode is the process of converting a byte array into a model.
@@ -200,7 +274,7 @@ In order to understand how the native model works, you need to understand the fo
 
 Under the hood, the native model is a thin wrapper around serialized data. The `id` and the `version` are twice encoded with a [`little_endian::U32`](https://docs.rs/zerocopy/latest/zerocopy/byteorder/little_endian/type.U32.html). That represents 8 bytes, that are added at the beginning of the data.
 
-```
+``` text
 +------------------+------------------+------------------------------------+
 |     ID (4 bytes) | Version (4 bytes)| Data (indeterminate-length bytes)  |
 +------------------+------------------+------------------------------------+
@@ -212,7 +286,7 @@ Full example [here](tests/example/example_define_model.rs).
 
 Native model has
 been designed to have a minimal and constant overhead. That means that the overhead is the same
-whatever the size of the data. Under the hood we use the [zerocopy](https://docs.rs/zerocopy/latest/zerocopy/) crate 
+whatever the size of the data. Under the hood we use the [zerocopy](https://docs.rs/zerocopy/latest/zerocopy/) crate
 to avoid unnecessary copies.
 
 👉 To know the total time of the encode/decode, you need to add the time of your serialization format.

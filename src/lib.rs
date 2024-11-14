@@ -15,6 +15,15 @@
 //!
 //! See examples in the [README.md](https://github.com/vincent-herlemont/native_model) file.
 
+#[cfg(doctest)]
+#[macro_use]
+extern crate doc_comment;
+
+#[cfg(doctest)]
+doc_comment! {
+    include_str!("../README.md")
+}
+
 #[cfg(any(
     feature = "serde",
     feature = "bincode_1_3",
