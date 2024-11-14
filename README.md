@@ -103,6 +103,8 @@ There are known issues with some `serde` advanced features such as:
 
 Or types implementing similar strategies such as [`serde_json::Value`][serde_json_value].
 
+The `rmp-serde` serialization format can optionally support them serializing structs as maps, the `RmpSerdeNamed` struct is provided to support this use-case.
+
 [serde_json_value]: https://docs.rs/serde_json/latest/serde_json/enum.Value.html
 
 ## Data model
