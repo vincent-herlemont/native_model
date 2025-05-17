@@ -3,8 +3,8 @@
 
 #[cfg(any(all(feature = "serde", feature = "bincode_1_3"), doc))]
 pub mod bincode_1_3;
-#[cfg(any(all(feature = "serde", feature = "bincode_2_rc"), doc))]
-pub mod bincode_2_rc;
+#[cfg(any(all(feature = "serde", feature = "bincode_2"), doc))]
+pub mod bincode_2;
 #[cfg(any(all(feature = "serde", feature = "postcard_1_0"), doc))]
 pub mod postcard_1_0;
 #[cfg(any(all(feature = "serde", feature = "rmp_serde_1_3"), doc))]
