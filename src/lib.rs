@@ -27,7 +27,7 @@ doc_comment! {
 #[cfg(any(
     feature = "serde",
     feature = "bincode_1_3",
-    feature = "bincode_2_rc",
+    feature = "bincode_2",
     feature = "postcard_1_0",
     feature = "rmp_serde_1_3",
     doc
@@ -37,7 +37,7 @@ mod codec;
 #[cfg(any(
     feature = "serde",
     feature = "bincode_1_3",
-    feature = "bincode_2_rc",
+    feature = "bincode_2",
     feature = "postcard_1_0",
     feature = "rmp_serde_1_3",
     doc
@@ -127,7 +127,7 @@ pub struct DowngradeError {
 /// # Errors
 ///
 /// The errors returned from this function depend on the [`Encode`] trait
-/// implementor (the serializer), i.e. `bincode_2_rc`.
+/// implementor (the serializer), i.e. `bincode_2`.
 pub fn encode<T: crate::Model>(model: &T) -> Result<Vec<u8>> {
     T::native_model_encode(model)
 }
@@ -148,7 +148,7 @@ pub fn encode_downgrade<T: crate::Model>(model: T, version: u32) -> Result<Vec<u
 /// # Errors
 ///
 /// The errors returned from this function depend on the [`Decode`] trait
-/// implementor (the deserializer), i.e. `bincode_2_rc`.
+/// implementor (the deserializer), i.e. `bincode_2`.
 pub fn decode<T: crate::Model>(data: Vec<u8>) -> Result<(T, u32)> {
     T::native_model_decode(data)
 }
@@ -164,8 +164,8 @@ pub trait Model: Sized {
 
     fn native_model_decode_upgrade_body(data: Vec<u8>, id: u32, version: u32) -> Result<Self>;
 
-    fn native_model_decode(data: Vec<u8>) -> Result<(Self, u32)> {
-        let native_model = crate::Wrapper::deserialize(&data[..]).unwrap();
+    fn native_model_decode(data: impl AsRef<[u8]>) -> Result<(Self, u32)> {
+        let native_model = crate::Wrapper::deserialize(data.as_ref()).unwrap();
         let source_id = native_model.get_id();
         let source_version = native_model.get_version();
         let result = Self::native_model_decode_upgrade_body(
