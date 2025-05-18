@@ -1,10 +1,10 @@
-#![cfg(feature = "bincode_2_rc")]
+#![cfg(feature = "bincode_2")]
 use native_model::{native_model};
 use serde::Deserialize;
 use serde::Serialize;
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-#[native_model(id = 1, version = 1, with = native_model::bincode_2_rc::Bincode)]
+#[native_model(id = 1, version = 1, with = native_model::bincode_2::Bincode)]
 struct Example {
     a: u32,
     b: u32,
