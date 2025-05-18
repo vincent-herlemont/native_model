@@ -11,7 +11,7 @@ impl<T: bincode::Encode> native_model::Encode<T> for Bincode {
     }
 }
 
-impl<T: bincode::Decode> native_model::Decode<T> for Bincode {
+impl<T: bincode::Decode<()>> native_model::Decode<T> for Bincode {
     type Error = bincode::error::DecodeError;
     fn decode(data: Vec<u8>) -> Result<T, bincode::error::DecodeError> {
         bincode::decode_from_slice(&data, config::standard()).map(|(result, _)| result)

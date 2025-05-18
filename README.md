@@ -95,14 +95,14 @@ You can use  default serialization formats via  the feature flags, like:
 
 ```toml
 [dependencies]
-native_model = { version = "0.1", features = ["bincode_2_rc"] }
+native_model = { version = "0.1", features = ["bincode_2"] }
 ```
 
 Each feature flag corresponds to a specific minor version of the serialization format. In order to avoid breaking
 changes, the default serialization format is the oldest one.
 
 - `bincode_1_3`: [bincode](https://docs.rs/bincode/1.3.3/bincode/) v1.3 (default)
-- `bincode_2_rc`: [bincode](https://docs.rs/bincode/2.0.0-rc.3/bincode/) v2.0.0-rc3
+- `bincode_2`: [bincode](https://docs.rs/bincode/2.0.0-rc.3/bincode/) v2.0.0-rc3
 - `postcard_1_0`: [postcard](https://docs.rs/postcard/1.0.0/postcard/) v1.0
 - `rpm_serde_1_3`: [rmp-serde](https://docs.rs/rmp-serde/1.3.0/rmp_serde/) v1.3
 
@@ -116,7 +116,7 @@ Full examples:
 
 Others examples,  see the default implementations:
 - [bincode v1.3](./src/codec/bincode_1_3.rs)
-- [bincode v2.0 (rc)](./src/codec/bincode_2_rc.rs)
+- [bincode v2.0 (rc)](./src/codec/bincode_2.rs)
 - [postcard v1.0](./src/codec/postcard_1_0.rs)
 - [rmp-serde v1.3](./src/codec/rmp_serde_1_3.rs)
 
@@ -235,7 +235,7 @@ impl TryFrom<DotV3> for DotV2 {
 	- **Warning: This codec may not work with all serde-derived types.**
 
 - [bincode 2.0.0-rc.3](https://crates.io/crates/bincode/2.0.0-rc.3)
-	- Enable the `bincode_2_rc` feature and use the `native_model::bincode_2_rc::Bincode` attribute to have `native_db` use this crate for serializing & deserializing.
+	- Enable the `bincode_2` feature and use the `native_model::bincode_2::Bincode` attribute to have `native_db` use this crate for serializing & deserializing.
 	- **Warning: This codec may not work with all serde-derived types.**
 
 - [postcard 1.0](https://crates.io/crates/postcard/1.0.8)
