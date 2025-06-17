@@ -28,5 +28,18 @@
       ],
       "automerge": true
     }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [
+        "^\\.github/workflows/[^/]+\\.ya?ml$"
+      ],
+      "matchStrings": [
+        "uses: hustcer/setup-nu@.*?\\n.*?version: '\\s*(?<currentValue>.*?)'"
+      ],
+      "depNameTemplate": "nushell",
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "nushell/nushell"
+    }
   ]
 }
