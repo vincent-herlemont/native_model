@@ -5,6 +5,7 @@ on:
     branches: [ main, next ]
   pull_request:
     branches: [ main, next ]
+  workflow_dispatch:
 
 jobs:
   build_test_common_os:
@@ -24,7 +25,7 @@ jobs:
       - uses: extractions/setup-just@v3
       - uses: hustcer/setup-nu@v3.19
         with:
-          version: '0.85'
+          version: '0.105.1'
       - name: Just version
         run: just --version
       - name: Build
@@ -35,7 +36,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: [build_test_common_os]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
       packages: write
@@ -44,19 +45,21 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           ref: main
+          fetch-depth: 0
 
       - name: install npm
         uses: actions/setup-node@v4
         with:
-          node-version: '16'
-
-      - name: install @semantic-release/exec
-        run: npm install @semantic-release/exec
+          node-version: '20'
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v3
+        uses: cycjimmy/semantic-release-action@v4
         with:
-          branch: main
+          extra_plugins: |
+            @semantic-release/commit-analyzer
+            @semantic-release/release-notes-generator
+            @semantic-release/exec
+            @semantic-release/github
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GLOBAL }}
           CARGO_TOKEN: ${{ secrets.CARGO_TOKEN }}
