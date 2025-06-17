@@ -5,6 +5,7 @@ on:
     branches: [ main, next ]
   pull_request:
     branches: [ main, next ]
+  workflow_dispatch:
 
 jobs:
   build_test_common_os:
@@ -35,7 +36,7 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: [build_test_common_os]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     permissions:
       contents: write
       packages: write
