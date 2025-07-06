@@ -27,7 +27,7 @@ pub(crate) struct ModelAttributes {
     pub(crate) try_from: Option<(Path, Path)>,
 }
 
-impl        Default for ModelAttributes {
+impl Default for ModelAttributes {
     fn default() -> Self {
         ModelAttributes {
             id: None,
@@ -57,10 +57,7 @@ impl ModelAttributes {
                 fields.next().unwrap().clone(),
             ));
         } else {
-            panic!(
-                "Unknown attribute: {}",
-                meta.path.get_ident().unwrap().to_string()
-            );
+            panic!("Unknown attribute: {}", meta.path.get_ident().unwrap());
         }
         Ok(())
     }

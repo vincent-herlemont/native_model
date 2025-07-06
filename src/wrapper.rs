@@ -1,6 +1,6 @@
 use crate::header::Header;
 use zerocopy::little_endian::U32;
-use zerocopy::{SplitByteSlice, SplitByteSliceMut, Ref, IntoBytes};
+use zerocopy::{IntoBytes, Ref, SplitByteSlice, SplitByteSliceMut};
 
 pub struct Wrapper<T: SplitByteSlice> {
     header: Ref<T, Header>,

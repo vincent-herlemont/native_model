@@ -1,7 +1,7 @@
 use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use native_model::Model;
 use native_model_macro::native_model;
 use serde::{Deserialize, Serialize};
-use native_model::Model;
 #[derive(Serialize, Deserialize)]
 #[native_model(id = 1, version = 1)]
 struct Data(Vec<u8>);
