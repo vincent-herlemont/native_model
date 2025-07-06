@@ -19,5 +19,5 @@ pub(crate) fn generate_native_model_decode_body(attrs: &ModelAttributes) -> Toke
         }
     };
 
-    gen.into()
+    gen
 }
