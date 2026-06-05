@@ -19,7 +19,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
       - uses: extractions/setup-just@v4
-      - uses: hustcer/setup-nu@v3.23
+      - uses: hustcer/setup-nu@v3.25
         with:
           version: '0.105.1'
         env:
