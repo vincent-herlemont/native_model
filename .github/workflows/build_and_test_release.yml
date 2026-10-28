@@ -53,7 +53,7 @@ jobs:
           node-version: '20'
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v8.1.3
+        uses: cycjimmy/semantic-release-action@v8.1.4
         with:
           dry_run: ${{ github.event_name != 'workflow_dispatch' }}
           extra_plugins: |
